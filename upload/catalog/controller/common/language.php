@@ -1,6 +1,6 @@
 <?php
-namespace Catalog\Controller\Common;
-class Language extends Controller {
+namespace Opencart\Application\Controller\Common;
+class Language extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('common/language');
 
@@ -24,18 +24,18 @@ class Language extends Controller {
 			$url = '&' . urldecode(http_build_query($url_data));
 		}
 
-		$data['languages'] = array();
+		$data['languages'] = [];
 
 		$this->load->model('localisation/language');
 
 		$results = $this->model_localisation_language->getLanguages();
 
 		foreach ($results as $result) {
-			$data['languages'][] = array(
+			$data['languages'][] = [
 				'name' => $result['name'],
 				'code' => $result['code'],
 				'href' => $this->url->link('common/language/language', 'language=' . $this->config->get('config_language') . '&code=' . $result['code'] . '&redirect=' . urlencode(str_replace('&amp;', '&', $this->url->link($route, 'language=' . $result['code'] . $url))))
-			);
+			];
 		}
 
 		return $this->load->view('common/language', $data);
@@ -54,11 +54,11 @@ class Language extends Controller {
 			$redirect = '';
 		}
 
-		$option = array(
+		$option = [
 			'max-age'  => time() + 60 * 60 * 24 * 30,
 			'path'     => '/',
 			'SameSite' => 'lax'
-		);
+		];
 
 		oc_setcookie('language', $code, $option);
 

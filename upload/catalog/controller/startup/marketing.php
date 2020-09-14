@@ -1,14 +1,14 @@
 <?php
-namespace Catalog\Controller\Startup;
-class Marketing extends Controller {
+namespace Opencart\Application\Controller\Startup;
+class Marketing extends \Opencart\System\Engine\Controller {
 	public function index() {
 		// Tracking Code
 		if (isset($this->request->get['tracking'])) {
-			$option = array(
+			$option = [
 				'max-age'  => time() + 3600 * 24 * 1000,
 				'path'     => '/',
 				'SameSite' => 'lax'
-			);
+			];
 
 			oc_setcookie('tracking', $this->request->get['tracking'], $option);
 

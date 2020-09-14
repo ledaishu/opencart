@@ -1,19 +1,19 @@
 <?php
-namespace Catalog\Controller\Common;
-class Footer extends Controller {
+namespace Opencart\Application\Controller\Common;
+class Footer extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('common/footer');
 
 		$this->load->model('catalog/information');
 
-		$data['informations'] = array();
+		$data['informations'] = [];
 
 		foreach ($this->model_catalog_information->getInformations() as $result) {
 			if ($result['bottom']) {
-				$data['informations'][] = array(
+				$data['informations'][] = [
 					'title' => $result['title'],
 					'href'  => $this->url->link('information/information', 'language=' . $this->config->get('config_language') . '&information_id=' . $result['information_id'])
-				);
+				];
 			}
 		}
 

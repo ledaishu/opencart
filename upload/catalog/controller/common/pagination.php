@@ -1,6 +1,6 @@
 <?php
-namespace Catalog\Controller\Common;
-class Pagination extends Controller {
+namespace Opencart\Application\Controller\Common;
+class Pagination extends \Opencart\System\Engine\Controller {
 	public function index($setting) {
 		if (isset($setting['total'])) {
 			$total = $setting['total'];
@@ -38,10 +38,10 @@ class Pagination extends Controller {
 		$data['page'] = $page;
 
 		if ($page > 1) {
-			$data['first'] = str_replace(array('&amp;page={page}', '?page={page}', '&page={page}'), '', $url);
+			$data['first'] = str_replace(['&amp;page={page}', '?page={page}', '&page={page}'], '', $url);
 
 			if ($page - 1 === 1) {
-				$data['prev'] = str_replace(array('&amp;page={page}', '?page={page}', '&page={page}'), '', $url);
+				$data['prev'] = str_replace(['&amp;page={page}', '?page={page}', '&page={page}'], '', $url);
 			} else {
 				$data['prev'] = str_replace('{page}', $page - 1, $url);
 			}
@@ -50,7 +50,7 @@ class Pagination extends Controller {
 			$data['prev'] = '';
 		}
 
-		$data['links'] = array();
+		$data['links'] = [];
 
 		if ($num_pages > 1) {
 			if ($num_pages <= $num_links) {
@@ -72,10 +72,10 @@ class Pagination extends Controller {
 			}
 
 			for ($i = $start; $i <= $end; $i++) {
-				$data['links'][] = array(
+				$data['links'][] = [
 					'page' => $i,
 					'href' => str_replace('{page}', $i, $url)
-				);
+				];
 			}
 		}
 

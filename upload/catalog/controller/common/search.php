@@ -1,6 +1,6 @@
 <?php
-namespace Catalog\Controller\Common;
-class Search extends Controller {
+namespace Opencart\Application\Controller\Common;
+class Search extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('common/search');
 

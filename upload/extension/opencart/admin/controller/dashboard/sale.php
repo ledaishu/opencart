@@ -1,9 +1,10 @@
 <?php
-class ControllerExtensionDashboardSale extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Extension\Opencart\Dashboard;
+class Sale extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
-		$this->load->language('extension/dashboard/sale');
+		$this->load->language('extension/opencart/dashboard/sale');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -23,24 +24,24 @@ class ControllerExtensionDashboardSale extends Controller {
 			$data['error_warning'] = '';
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_extension'),
 			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=dashboard')
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/dashboard/sale', 'user_token=' . $this->session->data['user_token'])
-		);
+			'href' => $this->url->link('extension/opencart/dashboard/sale', 'user_token=' . $this->session->data['user_token'])
+		];
 
-		$data['action'] = $this->url->link('extension/dashboard/sale', 'user_token=' . $this->session->data['user_token']);
+		$data['action'] = $this->url->link('extension/opencart/dashboard/sale', 'user_token=' . $this->session->data['user_token']);
 
 		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=dashboard');
 
@@ -50,7 +51,7 @@ class ControllerExtensionDashboardSale extends Controller {
 			$data['dashboard_sale_width'] = $this->config->get('dashboard_sale_width');
 		}
 	
-		$data['columns'] = array();
+		$data['columns'] = [];
 		
 		for ($i = 3; $i <= 12; $i++) {
 			$data['columns'][] = $i;
@@ -72,11 +73,11 @@ class ControllerExtensionDashboardSale extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('extension/dashboard/sale_form', $data));
+		$this->response->setOutput($this->load->view('extension/opencart/dashboard/sale_form', $data));
 	}
 
 	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/dashboard/sale')) {
+		if (!$this->user->hasPermission('modify', 'extension/opencart/dashboard/sale')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
@@ -84,15 +85,15 @@ class ControllerExtensionDashboardSale extends Controller {
 	}
 	
 	public function dashboard() {
-		$this->load->language('extension/dashboard/sale');
+		$this->load->language('extension/opencart/dashboard/sale');
 
 		$data['user_token'] = $this->session->data['user_token'];
 
-		$this->load->model('extension/dashboard/sale');
+		$this->load->model('extension/opencart/dashboard/sale');
 
-		$today = $this->model_extension_dashboard_sale->getTotalSales(array('filter_date_added' => date('Y-m-d', strtotime('-1 day'))));
+		$today = $this->model_extension_opencart_dashboard_sale->getTotalSales(['filter_date_added' => date('Y-m-d', strtotime('-1 day'))]);
 
-		$yesterday = $this->model_extension_dashboard_sale->getTotalSales(array('filter_date_added' => date('Y-m-d', strtotime('-2 day'))));
+		$yesterday = $this->model_extension_opencart_dashboard_sale->getTotalSales(['filter_date_added' => date('Y-m-d', strtotime('-2 day'))]);
 
 		$difference = $today - $yesterday;
 
@@ -102,7 +103,7 @@ class ControllerExtensionDashboardSale extends Controller {
 			$data['percentage'] = 0;
 		}
 
-		$sale_total = $this->model_extension_dashboard_sale->getTotalSales();
+		$sale_total = $this->model_extension_opencart_dashboard_sale->getTotalSales();
 
 		if ($sale_total > 1000000000000) {
 			$data['total'] = round($sale_total / 1000000000000, 1) . 'T';
@@ -118,6 +119,6 @@ class ControllerExtensionDashboardSale extends Controller {
 
 		$data['sale'] = $this->url->link('sale/order', 'user_token=' . $this->session->data['user_token']);
 
-		return $this->load->view('extension/dashboard/sale_info', $data);
+		return $this->load->view('extension/opencart/dashboard/sale_info', $data);
 	}
 }

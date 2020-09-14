@@ -1,9 +1,10 @@
 <?php
-class ControllerExtensionTotalHandling extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Extension\Opencart\Total;
+class Handling extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
-		$this->load->language('extension/total/handling');
+		$this->load->language('extension/opencart/total/handling');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -23,24 +24,24 @@ class ControllerExtensionTotalHandling extends Controller {
 			$data['error_warning'] = '';
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_extension'),
 			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=total')
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/total/handling', 'user_token=' . $this->session->data['user_token'])
-		);
+			'href' => $this->url->link('extension/opencart/total/handling', 'user_token=' . $this->session->data['user_token'])
+		];
 
-		$data['action'] = $this->url->link('extension/total/handling', 'user_token=' . $this->session->data['user_token']);
+		$data['action'] = $this->url->link('extension/opencart/total/handling', 'user_token=' . $this->session->data['user_token']);
 
 		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=total');
 
@@ -82,11 +83,11 @@ class ControllerExtensionTotalHandling extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('extension/total/handling', $data));
+		$this->response->setOutput($this->load->view('extension/opencart/total/handling', $data));
 	}
 
 	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/total/handling')) {
+		if (!$this->user->hasPermission('modify', 'extension/opencart/total/handling')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 

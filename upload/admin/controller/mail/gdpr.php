@@ -1,5 +1,6 @@
 <?php
-class ControllerMailGdpr extends Controller {
+namespace Opencart\Application\Controller\Mail;
+class Gdpr extends \Opencart\System\Engine\Controller {
 	// admin/model/customer/gdpr/editStatus
 	public function index(&$route, &$args, &$output) {
 		$this->load->model('customer/gdpr');
@@ -43,7 +44,7 @@ class ControllerMailGdpr extends Controller {
 			$language_code = $this->config->get('config_language');
 		}
 
-		$language = new Language($language_code);
+		$language = new \Opencart\System\Library\Language($language_code);
 		$language->load($language_code);
 		$language->load('mail/gdpr_export');
 
@@ -98,13 +99,13 @@ class ControllerMailGdpr extends Controller {
 		}
 
 		// Addresses
-		$data['addresses'] = array();
+		$data['addresses'] = [];
 
 		if ($customer_info) {
 			$results = $this->model_customer_customer->getAddresses($customer_info['customer_id']);
 
 			foreach ($results as $result) {
-				$address = array(
+				$address = [
 					'firstname' => $result['firstname'],
 					'lastname'  => $result['lastname'],
 					'address_1' => $result['address_1'],
@@ -113,7 +114,7 @@ class ControllerMailGdpr extends Controller {
 					'postcode'  => $result['postcode'],
 					'country'   => $result['country'],
 					'zone'      => $result['zone']
-				);
+				];
 
 				if (!in_array($address, $data['addresses'])) {
 					$data['addresses'][] = $address;
@@ -124,12 +125,12 @@ class ControllerMailGdpr extends Controller {
 		// Order Addresses
 		$this->load->model('sale/order');
 
-		$results = $this->model_sale_order->getOrders(array('filter_email' => $gdpr_info['email']));
+		$results = $this->model_sale_order->getOrders(['filter_email' => $gdpr_info['email']]);
 
 		foreach ($results as $result) {
 			$order_info = $this->model_sale_order->getOrder($result['order_id']);
 
-			$address = array(
+			$address = [
 				'firstname' => $order_info['payment_firstname'],
 				'lastname'  => $order_info['payment_lastname'],
 				'address_1' => $order_info['payment_address_1'],
@@ -138,13 +139,13 @@ class ControllerMailGdpr extends Controller {
 				'postcode'  => $order_info['payment_postcode'],
 				'country'   => $order_info['payment_country'],
 				'zone'      => $order_info['payment_zone']
-			);
+			];
 
 			if (!in_array($address, $data['addresses'])) {
 				$data['addresses'][] = $address;
 			}
 
-			$address = array(
+			$address = [
 				'firstname' => $order_info['shipping_firstname'],
 				'lastname'  => $order_info['shipping_lastname'],
 				'address_1' => $order_info['shipping_address_1'],
@@ -153,7 +154,7 @@ class ControllerMailGdpr extends Controller {
 				'postcode'  => $order_info['shipping_postcode'],
 				'country'   => $order_info['shipping_country'],
 				'zone'      => $order_info['shipping_zone']
-			);
+			];
 
 			if (!in_array($address, $data['addresses'])) {
 				$data['addresses'][] = $address;
@@ -161,16 +162,16 @@ class ControllerMailGdpr extends Controller {
 		}
 
 		// Ip's
-		$data['ips'] = array();
+		$data['ips'] = [];
 
 		if ($customer_info) {
 			$results = $this->model_customer_customer->getIps($customer_info['customer_id']);
 
 			foreach ($results as $result) {
-				$data['ips'][] = array(
+				$data['ips'][] = [
 					'ip'         => $result['ip'],
 					'date_added' => date($language->get('datetime_format'), strtotime($result['date_added']))
-				);
+				];
 			}
 		}
 
@@ -186,7 +187,7 @@ class ControllerMailGdpr extends Controller {
 			$data['store_url'] = HTTPS_CATALOG;
 		}
 
-		$mail = new Mail($this->config->get('config_mail_engine'));
+		$mail = new \Opencart\System\Library\Mail($this->config->get('config_mail_engine'));
 		$mail->parameter = $this->config->get('config_mail_parameter');
 		$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
 		$mail->smtp_username = $this->config->get('config_mail_smtp_username');
@@ -214,7 +215,7 @@ class ControllerMailGdpr extends Controller {
 			$language_code = $this->config->get('config_language');
 		}
 
-		$language = new Language($language_code);
+		$language = new \Opencart\System\Library\Language($language_code);
 		$language->load($language_code);
 		$language->load('mail/gdpr_approve');
 
@@ -256,7 +257,7 @@ class ControllerMailGdpr extends Controller {
 			$data['store_url'] = HTTPS_CATALOG;
 		}
 
-		$mail = new Mail($this->config->get('config_mail_engine'));
+		$mail = new \Opencart\System\Library\Mail($this->config->get('config_mail_engine'));
 		$mail->parameter = $this->config->get('config_mail_parameter');
 		$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
 		$mail->smtp_username = $this->config->get('config_mail_smtp_username');
@@ -284,7 +285,7 @@ class ControllerMailGdpr extends Controller {
 			$language_code = $this->config->get('config_language');
 		}
 
-		$language = new Language($language_code);
+		$language = new \Opencart\System\Library\Language($language_code);
 		$language->load($language_code);
 		$language->load('mail/gdpr_deny');
 
@@ -327,7 +328,7 @@ class ControllerMailGdpr extends Controller {
 			$data['contact'] = HTTPS_CATALOG . 'index.php?route=information/contact';
 		}
 
-		$mail = new Mail($this->config->get('config_mail_engine'));
+		$mail = new \Opencart\System\Library\Mail($this->config->get('config_mail_engine'));
 		$mail->parameter = $this->config->get('config_mail_parameter');
 		$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
 		$mail->smtp_username = $this->config->get('config_mail_smtp_username');
@@ -355,7 +356,7 @@ class ControllerMailGdpr extends Controller {
 			$language_code = $this->config->get('config_language');
 		}
 
-		$language = new Language($language_code);
+		$language = new \Opencart\System\Library\Language($language_code);
 		$language->load($language_code);
 		$language->load('mail/gdpr_delete');
 
@@ -399,7 +400,7 @@ class ControllerMailGdpr extends Controller {
 			$data['contact'] = HTTPS_CATALOG . 'index.php?route=information/contact';
 		}
 
-		$mail = new Mail($this->config->get('config_mail_engine'));
+		$mail = new \Opencart\System\Library\Mail($this->config->get('config_mail_engine'));
 		$mail->parameter = $this->config->get('config_mail_parameter');
 		$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
 		$mail->smtp_username = $this->config->get('config_mail_smtp_username');

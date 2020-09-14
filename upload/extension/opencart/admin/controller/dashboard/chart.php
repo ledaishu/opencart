@@ -1,9 +1,10 @@
 <?php
-class ControllerExtensionDashboardChart extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Extension\Opencart\Dashboard;
+class Chart extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
-		$this->load->language('extension/dashboard/chart');
+		$this->load->language('extension/opencart/dashboard/chart');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -23,24 +24,24 @@ class ControllerExtensionDashboardChart extends Controller {
 			$data['error_warning'] = '';
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_extension'),
 			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=dashboard')
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/dashboard/chart', 'user_token=' . $this->session->data['user_token'])
-		);
+			'href' => $this->url->link('extension/opencart/dashboard/chart', 'user_token=' . $this->session->data['user_token'])
+		];
 
-		$data['action'] = $this->url->link('extension/dashboard/chart', 'user_token=' . $this->session->data['user_token']);
+		$data['action'] = $this->url->link('extension/opencart/dashboard/chart', 'user_token=' . $this->session->data['user_token']);
 
 		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=dashboard');
 
@@ -50,7 +51,7 @@ class ControllerExtensionDashboardChart extends Controller {
 			$data['dashboard_chart_width'] = $this->config->get('dashboard_chart_width');
 		}
 	
-		$data['columns'] = array();
+		$data['columns'] = [];
 		
 		for ($i = 3; $i <= 12; $i++) {
 			$data['columns'][] = $i;
@@ -72,11 +73,11 @@ class ControllerExtensionDashboardChart extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('extension/dashboard/chart_form', $data));
+		$this->response->setOutput($this->load->view('extension/opencart/dashboard/chart_form', $data));
 	}
 
 	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/dashboard/chart')) {
+		if (!$this->user->hasPermission('modify', 'extension/opencart/dashboard/chart')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
@@ -84,28 +85,28 @@ class ControllerExtensionDashboardChart extends Controller {
 	}	
 	
 	public function dashboard() {
-		$this->load->language('extension/dashboard/chart');
+		$this->load->language('extension/opencart/dashboard/chart');
 
 		$data['user_token'] = $this->session->data['user_token'];
 
-		return $this->load->view('extension/dashboard/chart_info', $data);
+		return $this->load->view('extension/opencart/dashboard/chart_info', $data);
 	}
 
 	public function chart() {
-		$this->load->language('extension/dashboard/chart');
+		$this->load->language('extension/opencart/dashboard/chart');
 
-		$json = array();
+		$json = [];
 
-		$this->load->model('extension/dashboard/chart');
+		$this->load->model('extension/opencart/dashboard/chart');
 
-		$json['order'] = array();
-		$json['customer'] = array();
-		$json['xaxis'] = array();
+		$json['order'] = [];
+		$json['customer'] = [];
+		$json['xaxis'] = [];
 
 		$json['order']['label'] = $this->language->get('text_order');
 		$json['customer']['label'] = $this->language->get('text_customer');
-		$json['order']['data'] = array();
-		$json['customer']['data'] = array();
+		$json['order']['data'] = [];
+		$json['customer']['data'] = [];
 
 		if (isset($this->request->get['range'])) {
 			$range = $this->request->get['range'];
@@ -116,33 +117,33 @@ class ControllerExtensionDashboardChart extends Controller {
 		switch ($range) {
 			default:
 			case 'day':
-				$results = $this->model_extension_dashboard_chart->getTotalOrdersByDay();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalOrdersByDay();
 
 				foreach ($results as $key => $value) {
-					$json['order']['data'][] = array($key, $value['total']);
+					$json['order']['data'][] = [$key, $value['total']];
 				}
 
-				$results = $this->model_extension_dashboard_chart->getTotalCustomersByDay();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalCustomersByDay();
 
 				foreach ($results as $key => $value) {
-					$json['customer']['data'][] = array($key, $value['total']);
+					$json['customer']['data'][] = [$key, $value['total']];
 				}
 
 				for ($i = 0; $i < 24; $i++) {
-					$json['xaxis'][] = array($i, $i);
+					$json['xaxis'][] = [$i, $i];
 				}
 				break;
 			case 'week':
-				$results = $this->model_extension_dashboard_chart->getTotalOrdersByWeek();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalOrdersByWeek();
 
 				foreach ($results as $key => $value) {
-					$json['order']['data'][] = array($key, $value['total']);
+					$json['order']['data'][] = [$key, $value['total']];
 				}
 
-				$results = $this->model_extension_dashboard_chart->getTotalCustomersByWeek();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalCustomersByWeek();
 
 				foreach ($results as $key => $value) {
-					$json['customer']['data'][] = array($key, $value['total']);
+					$json['customer']['data'][] = [$key, $value['total']];
 				}
 
 				$date_start = strtotime('-' . date('w') . ' days');
@@ -150,43 +151,43 @@ class ControllerExtensionDashboardChart extends Controller {
 				for ($i = 0; $i < 7; $i++) {
 					$date = date('Y-m-d', $date_start + ($i * 86400));
 
-					$json['xaxis'][] = array(date('w', strtotime($date)), date('D', strtotime($date)));
+					$json['xaxis'][] = [date('w', strtotime($date)), date('D', strtotime($date))];
 				}
 				break;
 			case 'month':
-				$results = $this->model_extension_dashboard_chart->getTotalOrdersByMonth();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalOrdersByMonth();
 
 				foreach ($results as $key => $value) {
-					$json['order']['data'][] = array($key, $value['total']);
+					$json['order']['data'][] = [$key, $value['total']];
 				}
 
-				$results = $this->model_extension_dashboard_chart->getTotalCustomersByMonth();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalCustomersByMonth();
 
 				foreach ($results as $key => $value) {
-					$json['customer']['data'][] = array($key, $value['total']);
+					$json['customer']['data'][] = [$key, $value['total']];
 				}
 
 				for ($i = 1; $i <= date('t'); $i++) {
 					$date = date('Y') . '-' . date('m') . '-' . $i;
 
-					$json['xaxis'][] = array(date('j', strtotime($date)), date('d', strtotime($date)));
+					$json['xaxis'][] = [date('j', strtotime($date)), date('d', strtotime($date))];
 				}
 				break;
 			case 'year':
-				$results = $this->model_extension_dashboard_chart->getTotalOrdersByYear();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalOrdersByYear();
 
 				foreach ($results as $key => $value) {
-					$json['order']['data'][] = array($key, $value['total']);
+					$json['order']['data'][] = [$key, $value['total']];
 				}
 
-				$results = $this->model_extension_dashboard_chart->getTotalCustomersByYear();
+				$results = $this->model_extension_opencart_dashboard_chart->getTotalCustomersByYear();
 
 				foreach ($results as $key => $value) {
-					$json['customer']['data'][] = array($key, $value['total']);
+					$json['customer']['data'][] = [$key, $value['total']];
 				}
 
 				for ($i = 1; $i <= 12; $i++) {
-					$json['xaxis'][] = array($i, date('M', mktime(0, 0, 0, $i)));
+					$json['xaxis'][] = [$i, date('M', mktime(0, 0, 0, $i))];
 				}
 				break;
 		}

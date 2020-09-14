@@ -1,9 +1,10 @@
 <?php
-class ControllerExtensionModuleCategory extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Extension\Opencart\Module;
+class Category extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
-		$this->load->language('extension/module/category');
+		$this->load->language('extension/opencart/module/category');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -23,24 +24,24 @@ class ControllerExtensionModuleCategory extends Controller {
 			$data['error_warning'] = '';
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_extension'),
 			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module')
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/module/category', 'user_token=' . $this->session->data['user_token'])
-		);
+			'href' => $this->url->link('extension/opencart/module/category', 'user_token=' . $this->session->data['user_token'])
+		];
 
-		$data['action'] = $this->url->link('extension/module/category', 'user_token=' . $this->session->data['user_token']);
+		$data['action'] = $this->url->link('extension/opencart/module/category', 'user_token=' . $this->session->data['user_token']);
 
 		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module');
 
@@ -54,11 +55,11 @@ class ControllerExtensionModuleCategory extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('extension/module/category', $data));
+		$this->response->setOutput($this->load->view('extension/opencart/module/category', $data));
 	}
 
 	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/category')) {
+		if (!$this->user->hasPermission('modify', 'extension/opencart/module/category')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 

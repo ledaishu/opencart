@@ -1,7 +1,7 @@
 <?php
-namespace Catalog\Controller\Information;
-class Contact extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Information;
+class Contact extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
 		$this->load->language('information/contact');
@@ -9,7 +9,7 @@ class Contact extends Controller {
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			$mail = new Mail($this->config->get('config_mail_engine'));
+			$mail = new \Opencart\System\Library\Mail($this->config->get('config_mail_engine'));
 			$mail->parameter = $this->config->get('config_mail_parameter');
 			$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
 			$mail->smtp_username = $this->config->get('config_mail_smtp_username');
@@ -28,17 +28,17 @@ class Contact extends Controller {
 			$this->response->redirect($this->url->link('information/contact/success', 'language=' . $this->config->get('config_language')));
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('information/contact', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		if (isset($this->error['name'])) {
 			$data['error_name'] = $this->error['name'];
@@ -79,7 +79,7 @@ class Contact extends Controller {
 		$data['open'] = nl2br($this->config->get('config_open'));
 		$data['comment'] = $this->config->get('config_comment');
 
-		$data['locations'] = array();
+		$data['locations'] = [];
 
 		$this->load->model('localisation/location');
 
@@ -93,7 +93,7 @@ class Contact extends Controller {
 					$image = '';
 				}
 
-				$data['locations'][] = array(
+				$data['locations'][] = [
 					'location_id' => $location_info['location_id'],
 					'name'        => $location_info['name'],
 					'address'     => nl2br($location_info['address']),
@@ -103,7 +103,7 @@ class Contact extends Controller {
 					'image'       => $image,
 					'open'        => nl2br($location_info['open']),
 					'comment'     => $location_info['comment']
-				);
+				];
 			}
 		}
 
@@ -172,17 +172,17 @@ class Contact extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('information/contact', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		$data['text_message'] = $this->language->get('text_message');
 

@@ -1,7 +1,8 @@
 <?php
-class ModelExtensionTotalCredit extends Model {
+namespace Opencart\Application\Model\Extension\Opencart\Total;
+class Credit extends \Opencart\System\Engine\Model {
 	public function getTotal(&$totals, &$taxes, &$total) {
-		$this->load->language('extension/total/credit');
+		$this->load->language('extension/opencart/total/credit');
 
 		$balance = $this->customer->getBalance();
 
@@ -9,12 +10,12 @@ class ModelExtensionTotalCredit extends Model {
 			$credit = min($balance, $total);
 
 			if ((float)$credit > 0) {
-				$totals[] = array(
+				$totals[] = [
 					'code'       => 'credit',
 					'title'      => $this->language->get('text_credit'),
 					'value'      => -$credit,
 					'sort_order' => $this->config->get('total_credit_sort_order')
-				);
+				];
 
 				$total -= $credit;
 			}
@@ -22,7 +23,7 @@ class ModelExtensionTotalCredit extends Model {
 	}
 
 	public function confirm($order_info, $order_total) {
-		$this->load->language('extension/total/credit');
+		$this->load->language('extension/opencart/total/credit');
 
 		if ($order_info['customer_id']) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "customer_transaction SET customer_id = '" . (int)$order_info['customer_id'] . "', order_id = '" . (int)$order_info['order_id'] . "', description = '" . $this->db->escape(sprintf($this->language->get('text_order_id'), (int)$order_info['order_id'])) . "', amount = '" . (float)$order_total['value'] . "', date_added = NOW()");

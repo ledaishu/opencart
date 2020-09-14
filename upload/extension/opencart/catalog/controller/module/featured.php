@@ -1,20 +1,21 @@
 <?php
-class ControllerExtensionModuleFeatured extends Controller {
+namespace Opencart\Application\Controller\Extension\Opencart\Module;
+class Featured extends \Opencart\System\Engine\Controller {
 	public function index($setting) {
-		$this->load->language('extension/module/featured');
+		$this->load->language('extension/opencart/module/featured');
 
 		$this->load->model('catalog/product');
 
 		$this->load->model('tool/image');
 
-		$data['products'] = array();
+		$data['products'] = [];
 
 		if (!$setting['limit']) {
 			$setting['limit'] = 4;
 		}
 
 		if (!empty($setting['product'])) {
-			$product_data = array();
+			$product_data = [];
 
 			foreach ($setting['product'] as $product_id) {
 				$product_info = $this->model_catalog_product->getProduct($product_id);
@@ -51,7 +52,7 @@ class ControllerExtensionModuleFeatured extends Controller {
 					$tax = false;
 				}
 
-				$product_data = array(
+				$product_data = [
 					'product_id'  => $product['product_id'],
 					'thumb'       => $image,
 					'name'        => $product['name'],
@@ -62,14 +63,14 @@ class ControllerExtensionModuleFeatured extends Controller {
 					'minimum'     => $product['minimum'] > 0 ? $product['minimum'] : 1,
 					'rating'      => $product['rating'],
 					'href'        => $this->url->link('product/product', 'language=' . $this->config->get('config_language') . '&product_id=' . $product['product_id'])
-				);
+				];
 
 				$data['products'][] = $this->load->controller('product/thumb', $product_data);
 			}
 		}
 
 		if ($data['products']) {
-			return $this->load->view('extension/module/featured', $data);
+			return $this->load->view('extension/opencart/module/featured', $data);
 		}
 	}
 }

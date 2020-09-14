@@ -1,13 +1,14 @@
 <?php
-class ControllerExtensionModuleLatest extends Controller {
+namespace Opencart\Application\Controller\Extension\Opencart\Module;
+class Latest extends \Opencart\System\Engine\Controller {
 	public function index($setting) {
-		$this->load->language('extension/module/latest');
+		$this->load->language('extension/opencart/module/latest');
 
 		$this->load->model('catalog/product');
 
 		$this->load->model('tool/image');
 
-		$data['products'] = array();
+		$data['products'] = [];
 
 		$results = $this->model_catalog_product->getLatest($setting['limit']);
 
@@ -37,7 +38,7 @@ class ControllerExtensionModuleLatest extends Controller {
 					$tax = false;
 				}
 
-				$product_data = array(
+				$product_data = [
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
 					'name'        => $result['name'],
@@ -48,12 +49,12 @@ class ControllerExtensionModuleLatest extends Controller {
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],
 					'href'        => $this->url->link('product/product', 'language=' . $this->config->get('config_language') . '&product_id=' . $result['product_id'])
-				);
+				];
 
 				$data['products'][] = $this->load->controller('product/thumb', $product_data);
 			}
 
-			return $this->load->view('extension/module/latest', $data);
+			return $this->load->view('extension/opencart/module/latest', $data);
 		}
 	}
 }

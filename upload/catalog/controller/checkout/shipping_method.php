@@ -1,12 +1,12 @@
 <?php
-namespace Catalog\Controller\Checkout;
-class ShippingMethod extends Controller {
+namespace Opencart\Application\Controller\Checkout;
+class ShippingMethod extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('checkout/checkout');
 
 		if (isset($this->session->data['shipping_address'])) {
 			// Shipping Methods
-			$method_data = array();
+			$method_data = [];
 
 			$this->load->model('setting/extension');
 
@@ -14,22 +14,22 @@ class ShippingMethod extends Controller {
 
 			foreach ($results as $result) {
 				if ($this->config->get('shipping_' . $result['code'] . '_status')) {
-					$this->load->model('extension/shipping/' . $result['code']);
+					$this->load->model('extension/' . $result['extension'] . '/shipping/' . $result['code']);
 
-					$quote = $this->{'model_extension_shipping_' . $result['code']}->getQuote($this->session->data['shipping_address']);
+					$quote = $this->{'model_extension_' . $result['extension'] . '_shipping_' . $result['code']}->getQuote($this->session->data['shipping_address']);
 
 					if ($quote) {
-						$method_data[$result['code']] = array(
+						$method_data[$result['code']] = [
 							'title'      => $quote['title'],
 							'quote'      => $quote['quote'],
 							'sort_order' => $quote['sort_order'],
 							'error'      => $quote['error']
-						);
+						];
 					}
 				}
 			}
 
-			$sort_order = array();
+			$sort_order = [];
 
 			foreach ($method_data as $key => $value) {
 				$sort_order[$key] = $value['sort_order'];
@@ -49,7 +49,7 @@ class ShippingMethod extends Controller {
 		if (isset($this->session->data['shipping_methods'])) {
 			$data['shipping_methods'] = $this->session->data['shipping_methods'];
 		} else {
-			$data['shipping_methods'] = array();
+			$data['shipping_methods'] = [];
 		}
 
 		if (isset($this->session->data['shipping_method']['code'])) {
@@ -70,7 +70,7 @@ class ShippingMethod extends Controller {
 	public function save() {
 		$this->load->language('checkout/checkout');
 
-		$json = array();
+		$json = [];
 
 		// Validate if shipping is required. If not the customer should not have reached this page.
 		if (!$this->cart->hasShipping()) {

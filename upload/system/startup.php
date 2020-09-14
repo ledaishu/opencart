@@ -45,15 +45,6 @@ if ((isset($_SERVER['HTTPS']) && (($_SERVER['HTTPS'] == 'on') || ($_SERVER['HTTP
 	$_SERVER['HTTPS'] = false;
 }
 
-// Engine
-require_once(DIR_SYSTEM . 'engine/controller.php');
-require_once(DIR_SYSTEM . 'engine/model.php');
-require_once(DIR_SYSTEM . 'engine/action.php');
-require_once(DIR_SYSTEM . 'engine/event.php');
-require_once(DIR_SYSTEM . 'engine/loader.php');
-require_once(DIR_SYSTEM . 'engine/registry.php');
-require_once(DIR_SYSTEM . 'engine/proxy.php');
-
 // Helper
 require_once(DIR_SYSTEM . 'helper/general.php');
 require_once(DIR_SYSTEM . 'helper/utf8.php');
@@ -61,48 +52,8 @@ require_once(DIR_SYSTEM . 'helper/utf8.php');
 // Vendor Autoloader
 require_once(DIR_STORAGE . 'vendor/autoload.php');
 
-// Library Autoloader
-function autoloader($class) {
-	echo '$class ' . $class . "\n";
+// OpenCart Autoloader
+require_once(DIR_SYSTEM . 'engine/autoloader.php');
 
-	$file = '';
-
-	$path = strtolower(str_replace('\\', '/', $class));
-
-	$type = substr($path, 0, strpos($path, '/'));
-
-	switch ($type) {
-		case 'catalog':
-			$file = DIR_APPLICATION . substr($path, strpos($path, '/') + 1)  . '.php';
-			break;
-		case 'admin':
-			$file = DIR_APPLICATION . substr($path, strpos($path, '/') + 1)  . '.php';
-			break;
-		case 'system':
-			$file = DIR_SYSTEM . substr($path, strpos($path, '/') + 1) . '.php';
-			break;
-	}
-
-	//$file = DIR_SYSTEM . $path . '.php';
-
-
-	echo '$path ' . $path . "\n";
-	echo '$file ' . $file . "\n";
-
-	if (is_file($file)) {
-		include_once($file);
-
-		return true;
-	} else {
-		echo $class;
-
-		return false;
-	}
-}
-
-spl_autoload_register('autoloader');
-spl_autoload_extensions('.php');
-
-function start($application) {
-	require_once(DIR_SYSTEM . 'framework.php');	
-}
+// Framework
+require_once(DIR_SYSTEM . 'framework.php');

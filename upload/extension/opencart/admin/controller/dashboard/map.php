@@ -1,9 +1,10 @@
 <?php
-class ControllerExtensionDashboardMap extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Extension\Opencart\Dashboard;
+class Map extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
-		$this->load->language('extension/dashboard/map');
+		$this->load->language('extension/opencart/dashboard/map');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -23,24 +24,24 @@ class ControllerExtensionDashboardMap extends Controller {
 			$data['error_warning'] = '';
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_extension'),
 			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=dashboard')
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/dashboard/map', 'user_token=' . $this->session->data['user_token'])
-		);
+			'href' => $this->url->link('extension/opencart/dashboard/map', 'user_token=' . $this->session->data['user_token'])
+		];
 
-		$data['action'] = $this->url->link('extension/dashboard/map', 'user_token=' . $this->session->data['user_token']);
+		$data['action'] = $this->url->link('extension/opencart/dashboard/map', 'user_token=' . $this->session->data['user_token']);
 
 		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=dashboard');
 
@@ -50,7 +51,7 @@ class ControllerExtensionDashboardMap extends Controller {
 			$data['dashboard_map_width'] = $this->config->get('dashboard_map_width');
 		}
 
-		$data['columns'] = array();
+		$data['columns'] = [];
 		
 		for ($i = 3; $i <= 12; $i++) {
 			$data['columns'][] = $i;
@@ -72,11 +73,11 @@ class ControllerExtensionDashboardMap extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('extension/dashboard/map_form', $data));
+		$this->response->setOutput($this->load->view('extension/opencart/dashboard/map_form', $data));
 	}
 
 	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/dashboard/map')) {
+		if (!$this->user->hasPermission('modify', 'extension/opencart/dashboard/map')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
@@ -84,25 +85,25 @@ class ControllerExtensionDashboardMap extends Controller {
 	}
 		
 	public function dashboard() {
-		$this->load->language('extension/dashboard/map');
+		$this->load->language('extension/opencart/dashboard/map');
 
 		$data['user_token'] = $this->session->data['user_token'];
 		
-		return $this->load->view('extension/dashboard/map_info', $data);
+		return $this->load->view('extension/opencart/dashboard/map_info', $data);
 	}
 
 	public function map() {
-		$json = array();
+		$json = [];
 
-		$this->load->model('extension/dashboard/map');
+		$this->load->model('extension/opencart/dashboard/map');
 
-		$results = $this->model_extension_dashboard_map->getTotalOrdersByCountry();
+		$results = $this->model_extension_opencart_dashboard_map->getTotalOrdersByCountry();
 
 		foreach ($results as $result) {
-			$json[strtolower($result['iso_code_2'])] = array(
+			$json[strtolower($result['iso_code_2'])] = [
 				'total'  => $result['total'],
 				'amount' => $this->currency->format($result['amount'], $this->config->get('config_currency'))
-			);
+			];
 		}
 
 		$this->response->addHeader('Content-Type: application/json');

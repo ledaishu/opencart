@@ -1,7 +1,8 @@
 <?php
-class ControllerExtensionModuleAccount extends Controller {
+namespace Opencart\Application\Controller\Extension\Opencart\Module;
+class Account extends \Opencart\System\Engine\Controller {
 	public function index() {
-		$this->load->language('extension/module/account');
+		$this->load->language('extension/opencart/module/account');
 
 		$data['logged'] = $this->customer->isLogged();
 		$data['register'] = $this->url->link('account/register', 'language=' . $this->config->get('config_language'));
@@ -21,6 +22,6 @@ class ControllerExtensionModuleAccount extends Controller {
 		$data['newsletter'] = $this->url->link('account/newsletter', 'language=' . $this->config->get('config_language'));
 		$data['recurring'] = $this->url->link('account/recurring', 'language=' . $this->config->get('config_language'));
 
-		return $this->load->view('extension/module/account', $data);
+		return $this->load->view('extension/opencart/module/account', $data);
 	}
 }

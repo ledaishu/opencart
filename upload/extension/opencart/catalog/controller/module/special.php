@@ -1,20 +1,21 @@
 <?php
-class ControllerExtensionModuleSpecial extends Controller {
+namespace Opencart\Application\Controller\Extension\Opencart\Module;
+class Special extends \Opencart\System\Engine\Controller {
 	public function index($setting) {
-		$this->load->language('extension/module/special');
+		$this->load->language('extension/opencart/module/special');
 
 		$this->load->model('catalog/product');
 
 		$this->load->model('tool/image');
 
-		$data['products'] = array();
+		$data['products'] = [];
 
-		$filter_data = array(
+		$filter_data = [
 			'sort'  => 'pd.name',
 			'order' => 'ASC',
 			'start' => 0,
 			'limit' => $setting['limit']
-		);
+		];
 
 		$results = $this->model_catalog_product->getSpecials($filter_data);
 
@@ -44,7 +45,7 @@ class ControllerExtensionModuleSpecial extends Controller {
 					$tax = false;
 				}
 
-				$product_data = array(
+				$product_data = [
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
 					'name'        => $result['name'],
@@ -55,12 +56,12 @@ class ControllerExtensionModuleSpecial extends Controller {
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],
 					'href'        => $this->url->link('product/product', 'language=' . $this->config->get('config_language') . '&product_id=' . $result['product_id'])
-				);
+				];
 
 				$data['products'][] = $this->load->controller('product/thumb', $product_data);
 			}
 
-			return $this->load->view('extension/module/special', $data);
+			return $this->load->view('extension/opencart/module/special', $data);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <?php
-namespace Catalog\Controller\Account;
-class WishList extends Controller {
+namespace Opencart\Application\Controller\Account;
+class WishList extends \Opencart\System\Engine\Controller {
 	public function index() {
 		if (!$this->customer->isLogged()) {
 			$this->session->data['redirect'] = $this->url->link('account/wishlist', 'language=' . $this->config->get('config_language'));
@@ -27,22 +27,22 @@ class WishList extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_account'),
 			'href' => $this->url->link('account/account', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('account/wishlist', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		if (isset($this->session->data['success'])) {
 			$data['success'] = $this->session->data['success'];
@@ -52,7 +52,7 @@ class WishList extends Controller {
 			$data['success'] = '';
 		}
 
-		$data['products'] = array();
+		$data['products'] = [];
 
 		$results = $this->model_account_wishlist->getWishlist();
 
@@ -86,7 +86,7 @@ class WishList extends Controller {
 					$special = false;
 				}
 
-				$data['products'][] = array(
+				$data['products'][] = [
 					'product_id' => $product_info['product_id'],
 					'thumb'      => $image,
 					'name'       => $product_info['name'],
@@ -97,7 +97,7 @@ class WishList extends Controller {
 					'minimum'    => $product_info['minimum'] > 0 ? $product_info['minimum'] : 1,
 					'href'       => $this->url->link('product/product', 'language=' . $this->config->get('config_language') . '&product_id=' . $product_info['product_id']),
 					'remove'     => $this->url->link('account/wishlist', 'language=' . $this->config->get('config_language') . '&remove=' . $product_info['product_id'])
-				);
+				];
 			} else {
 				$this->model_account_wishlist->deleteWishlist($result['product_id']);
 			}
@@ -118,7 +118,7 @@ class WishList extends Controller {
 	public function add() {
 		$this->load->language('account/wishlist');
 
-		$json = array();
+		$json = [];
 
 		if (isset($this->request->post['product_id'])) {
 			$product_id = $this->request->post['product_id'];
@@ -142,7 +142,7 @@ class WishList extends Controller {
 				$json['total'] = sprintf($this->language->get('text_wishlist'), $this->model_account_wishlist->getTotalWishlist());
 			} else {
 				if (!isset($this->session->data['wishlist'])) {
-					$this->session->data['wishlist'] = array();
+					$this->session->data['wishlist'] = [];
 				}
 
 				$this->session->data['wishlist'][] = $this->request->post['product_id'];

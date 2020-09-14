@@ -1,6 +1,6 @@
 <?php
-namespace Catalog\Controller\Checkout;
-class ShippingAddress extends Controller {
+namespace Opencart\Application\Controller\Checkout;
+class ShippingAddress extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('checkout/checkout');
 
@@ -37,7 +37,7 @@ class ShippingAddress extends Controller {
 		$data['countries'] = $this->model_localisation_country->getCountries();
 
 		// Custom Fields
-		$data['custom_fields'] = array();
+		$data['custom_fields'] = [];
 
 		$this->load->model('account/custom_field');
 
@@ -52,7 +52,7 @@ class ShippingAddress extends Controller {
 		if (isset($this->session->data['shipping_address']['custom_field'])) {
 			$data['shipping_address_custom_field'] = $this->session->data['shipping_address']['custom_field'];
 		} else {
-			$data['shipping_address_custom_field'] = array();
+			$data['shipping_address_custom_field'] = [];
 		}
 
 		$this->response->setOutput($this->load->view('checkout/shipping_address', $data));
@@ -61,7 +61,7 @@ class ShippingAddress extends Controller {
 	public function save() {
 		$this->load->language('checkout/checkout');
 
-		$json = array();
+		$json = [];
 
 		// Validate if customer is logged in.
 		if (!$this->customer->isLogged()) {
@@ -155,7 +155,7 @@ class ShippingAddress extends Controller {
 					if ($custom_field['location'] == 'address') {
 						if ($custom_field['required'] && empty($this->request->post['custom_field'][$custom_field['location']][$custom_field['custom_field_id']])) {
 							$json['error']['custom_field' . $custom_field['custom_field_id']] = sprintf($this->language->get('error_custom_field'), $custom_field['name']);
-						} elseif (($custom_field['type'] == 'text') && !empty($custom_field['validation']) && !filter_var($this->request->post['custom_field'][$custom_field['location']][$custom_field['custom_field_id']], FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => '/' . html_entity_decode($custom_field['validation'], ENT_QUOTES, 'UTF-8') . '/')))) {
+						} elseif (($custom_field['type'] == 'text') && !empty($custom_field['validation']) && !filter_var($this->request->post['custom_field'][$custom_field['location']][$custom_field['custom_field_id']], FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/' . html_entity_decode($custom_field['validation'], ENT_QUOTES, 'UTF-8') . '/']])) {
 							$json['error']['custom_field' . $custom_field['custom_field_id']] = sprintf($this->language->get('error_custom_field'), $custom_field['name']);
 						}
 					}

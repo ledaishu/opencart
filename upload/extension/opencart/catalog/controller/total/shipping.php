@@ -1,8 +1,9 @@
 <?php
-class ControllerExtensionTotalShipping extends Controller {
+namespace Opencart\Application\Controller\Extension\Opencart\Total;
+class Shipping extends \Opencart\System\Engine\Controller {
 	public function index() {
 		if ($this->config->get('total_shipping_status') && $this->config->get('total_shipping_estimator') && $this->cart->hasShipping()) {
-			$this->load->language('extension/total/shipping');
+			$this->load->language('extension/opencart/total/shipping');
 
 			if (isset($this->session->data['shipping_address']['country_id'])) {
 				$data['country_id'] = $this->session->data['shipping_address']['country_id'];
@@ -32,14 +33,14 @@ class ControllerExtensionTotalShipping extends Controller {
 				$data['shipping_method'] = '';
 			}
 
-			return $this->load->view('extension/total/shipping', $data);
+			return $this->load->view('extension/opencart/total/shipping', $data);
 		}
 	}
 
 	public function quote() {
-		$this->load->language('extension/total/shipping');
+		$this->load->language('extension/opencart/total/shipping');
 
-		$json = array();
+		$json = [];
 
 		if (!$this->cart->hasProducts()) {
 			$json['error']['warning'] = $this->language->get('error_product');
@@ -92,7 +93,7 @@ class ControllerExtensionTotalShipping extends Controller {
 				$zone_code = '';
 			}
 
-			$this->session->data['shipping_address'] = array(
+			$this->session->data['shipping_address'] = [
 				'firstname'      => '',
 				'lastname'       => '',
 				'company'        => '',
@@ -108,9 +109,9 @@ class ControllerExtensionTotalShipping extends Controller {
 				'iso_code_2'     => $iso_code_2,
 				'iso_code_3'     => $iso_code_3,
 				'address_format' => $address_format
-			);
+			];
 
-			$quote_data = array();
+			$quote_data = [];
 
 			$this->load->model('setting/extension');
 
@@ -123,17 +124,17 @@ class ControllerExtensionTotalShipping extends Controller {
 					$quote = $this->{'model_extension_shipping_' . $result['code']}->getQuote($this->session->data['shipping_address']);
 
 					if ($quote) {
-						$quote_data[$result['code']] = array(
+						$quote_data[$result['code']] = [
 							'title'      => $quote['title'],
 							'quote'      => $quote['quote'],
 							'sort_order' => $quote['sort_order'],
 							'error'      => $quote['error']
-						);
+						];
 					}
 				}
 			}
 
-			$sort_order = array();
+			$sort_order = [];
 
 			foreach ($quote_data as $key => $value) {
 				$sort_order[$key] = $value['sort_order'];
@@ -155,9 +156,9 @@ class ControllerExtensionTotalShipping extends Controller {
 	}
 
 	public function shipping() {
-		$this->load->language('extension/total/shipping');
+		$this->load->language('extension/opencart/total/shipping');
 
-		$json = array();
+		$json = [];
 
 		if (!empty($this->request->post['shipping_method'])) {
 			$shipping = explode('.', $this->request->post['shipping_method']);
@@ -184,7 +185,7 @@ class ControllerExtensionTotalShipping extends Controller {
 	}
 
 	public function country() {
-		$json = array();
+		$json = [];
 
 		$this->load->model('localisation/country');
 
@@ -193,7 +194,7 @@ class ControllerExtensionTotalShipping extends Controller {
 		if ($country_info) {
 			$this->load->model('localisation/zone');
 
-			$json = array(
+			$json = [
 				'country_id'        => $country_info['country_id'],
 				'name'              => $country_info['name'],
 				'iso_code_2'        => $country_info['iso_code_2'],
@@ -202,7 +203,7 @@ class ControllerExtensionTotalShipping extends Controller {
 				'postcode_required' => $country_info['postcode_required'],
 				'zone'              => $this->model_localisation_zone->getZonesByCountryId($this->request->get['country_id']),
 				'status'            => $country_info['status']
-			);
+			];
 		}
 
 		$this->response->addHeader('Content-Type: application/json');

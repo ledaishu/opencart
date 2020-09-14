@@ -1,5 +1,6 @@
 <?php
-class ModelExtensionPaymentCOD extends Model {
+namespace Opencart\Application\Model\Extension\Opencart\Payment;
+class COD extends \Opencart\System\Engine\Model {
 	public function getMethod($address, $total) {
 		$this->load->language('extension/payment/cod');
 
@@ -17,15 +18,15 @@ class ModelExtensionPaymentCOD extends Model {
 			$status = false;
 		}
 
-		$method_data = array();
+		$method_data = [];
 
 		if ($status) {
-			$method_data = array(
+			$method_data = [
 				'code'       => 'cod',
 				'title'      => $this->language->get('text_title'),
 				'terms'      => '',
 				'sort_order' => $this->config->get('payment_cod_sort_order')
-			);
+			];
 		}
 
 		return $method_data;

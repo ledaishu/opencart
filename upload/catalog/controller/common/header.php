@@ -1,17 +1,17 @@
 <?php
-namespace Catalog\Controller\Common;
-class Header extends Controller {
+namespace Opencart\Application\Controller\Common;
+class Header extends \Opencart\System\Engine\Controller {
 	public function index() {
 		// Analytics
 		$this->load->model('setting/extension');
 
-		$data['analytics'] = array();
+		$data['analytics'] = [];
 
 		$analytics = $this->model_setting_extension->getExtensions('analytics');
 
 		foreach ($analytics as $analytic) {
 			if ($this->config->get('analytics_' . $analytic['code'] . '_status')) {
-				$data['analytics'][] = $this->load->controller('extension/analytics/' . $analytic['code'], $this->config->get('analytics_' . $analytic['code'] . '_status'));
+				$data['analytics'][] = $this->load->controller('extension/' . $analytic['extension'] . '/analytics/' . $analytic['code'], $this->config->get('analytics_' . $analytic['code'] . '_status'));
 			}
 		}
 

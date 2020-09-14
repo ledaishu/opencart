@@ -1,6 +1,6 @@
 <?php
-namespace Catalog\Controller\Startup;
-class SeoUrl extends Controller {
+namespace Opencart\Application\Controller\Startup;
+class SeoUrl extends \Opencart\System\Engine\Controller {
 	public function index() {
 		// Add rewrite to URL class
 		if ($this->config->get('config_seo_url')) {
@@ -59,9 +59,9 @@ class SeoUrl extends Controller {
 		}
 
 		// Start changing the URL query into a path
-		$path_data = array();
+		$path_data = [];
 
-		$query = array();
+		$query = [];
 
 		// Parse the query into its separate parts
 		parse_str($url_info['query'], $query);
@@ -70,7 +70,7 @@ class SeoUrl extends Controller {
 			$results = $this->model_design_seo_profile->getSeoProfilesByKey($key);
 
 			foreach ($results as $result) {
-				$match = array();
+				$match = [];
 
 				$regex = html_entity_decode($result['regex'], ENT_QUOTES, 'UTF-8');
 
@@ -78,17 +78,17 @@ class SeoUrl extends Controller {
 					$keyword = $this->model_design_seo_url->getKeywordByKeyValue($key, $match[0]);
 
 					if ($keyword) {
-						$path_data[] = array(
+						$path_data[] = [
 							'keyword'    => $keyword,
 							'remove'     => $result['remove'],
 							'sort_order' => $result['sort_order']
-						);
+						];
 					}
 				}
 			}
 		}
 
-		$sort_order = array();
+		$sort_order = [];
 
 		foreach ($path_data as $key => $value) {
 			$sort_order[$key] = $value['sort_order'];

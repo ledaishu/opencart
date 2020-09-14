@@ -1,15 +1,15 @@
 <?php
-namespace Catalog\Controller\Information;
-class Tracking extends Controller {
+namespace Opencart\Application\Controller\Information;
+class Tracking extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('information/tracking');
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['column_right'] = $this->load->controller('common/column_right');
@@ -22,7 +22,7 @@ class Tracking extends Controller {
 	}
 	
 	public function track() {
-		$json = array();
+		$json = [];
 		
 		$this->load->model('account/shipping');
 		

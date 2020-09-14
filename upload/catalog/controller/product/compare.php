@@ -1,6 +1,6 @@
 <?php
-namespace Catalog\Controller\Product;
-class Compare extends Controller {
+namespace Opencart\Application\Controller\Product;
+class Compare extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('product/compare');
 
@@ -9,7 +9,7 @@ class Compare extends Controller {
 		$this->load->model('tool/image');
 
 		if (!isset($this->session->data['compare'])) {
-			$this->session->data['compare'] = array();
+			$this->session->data['compare'] = [];
 		}
 
 		if (isset($this->request->get['remove'])) {
@@ -26,17 +26,17 @@ class Compare extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('product/compare', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		if (isset($this->session->data['success'])) {
 			$data['success'] = $this->session->data['success'];
@@ -46,9 +46,9 @@ class Compare extends Controller {
 			$data['success'] = '';
 		}
 
-		$data['products'] = array();
+		$data['products'] = [];
 
-		$data['attribute_groups'] = array();
+		$data['attribute_groups'] = [];
 
 		foreach ($this->session->data['compare'] as $key => $product_id) {
 			$product_info = $this->model_catalog_product->getProduct($product_id);
@@ -80,7 +80,7 @@ class Compare extends Controller {
 					$availability = $this->language->get('text_instock');
 				}
 
-				$attribute_data = array();
+				$attribute_data = [];
 
 				$attribute_groups = $this->model_catalog_product->getAttributes($product_id);
 
@@ -90,7 +90,7 @@ class Compare extends Controller {
 					}
 				}
 
-				$data['products'][$product_id] = array(
+				$data['products'][$product_id] = [
 					'product_id'   => $product_info['product_id'],
 					'name'         => $product_info['name'],
 					'thumb'        => $image,
@@ -110,7 +110,7 @@ class Compare extends Controller {
 					'attribute'    => $attribute_data,
 					'href'         => $this->url->link('product/product', 'language=' . $this->config->get('config_language') . '&product_id=' . $product_id),
 					'remove'       => $this->url->link('product/compare', 'language=' . $this->config->get('config_language') . '&remove=' . $product_id)
-				);
+				];
 
 				foreach ($attribute_groups as $attribute_group) {
 					$data['attribute_groups'][$attribute_group['attribute_group_id']]['name'] = $attribute_group['name'];
@@ -139,10 +139,10 @@ class Compare extends Controller {
 	public function add() {
 		$this->load->language('product/compare');
 
-		$json = array();
+		$json = [];
 
 		if (!isset($this->session->data['compare'])) {
-			$this->session->data['compare'] = array();
+			$this->session->data['compare'] = [];
 		}
 
 		if (isset($this->request->post['product_id'])) {

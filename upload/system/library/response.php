@@ -13,9 +13,9 @@
  * Stores the response so the correct headers can go out before the response output is shown.
  *
 */
-namespace System\Library;
+namespace Opencart\System\Library;
 class Response {
-	private $headers = array();
+	private $headers = [];
 	private $level = 0;
 	private $output;
 
@@ -37,7 +37,7 @@ class Response {
 	 *
  	*/
 	public function redirect($url, $status = 302) {
-		header('Location: ' . str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), $url), true, $status);
+		header('Location: ' . str_replace(['&amp;', "\n", "\r"], ['&', '', ''], $url), true, $status);
 		exit();
 	}
 	

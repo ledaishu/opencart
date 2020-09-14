@@ -1,12 +1,13 @@
 <?php
-class ControllerExtensionModuleCategory extends Controller {
+namespace Opencart\Application\Controller\Extension\Opencart\Module;
+class Category extends \Opencart\System\Engine\Controller {
 	public function index() {
-		$this->load->language('extension/module/category');
+		$this->load->language('extension/opencart/module/category');
 
 		if (isset($this->request->get['path'])) {
 			$parts = explode('_', (string)$this->request->get['path']);
 		} else {
-			$parts = array();
+			$parts = [];
 		}
 
 		if (isset($parts[0])) {
@@ -25,40 +26,40 @@ class ControllerExtensionModuleCategory extends Controller {
 
 		$this->load->model('catalog/product');
 
-		$data['categories'] = array();
+		$data['categories'] = [];
 
 		$categories = $this->model_catalog_category->getCategories(0);
 
 		foreach ($categories as $category) {
-			$children_data = array();
+			$children_data = [];
 
 			if ($category['category_id'] == $data['category_id']) {
 				$children = $this->model_catalog_category->getCategories($category['category_id']);
 
 				foreach ($children as $child) {
-					$filter_data = array('filter_category_id' => $child['category_id'], 'filter_sub_category' => true);
+					$filter_data = ['filter_category_id' => $child['category_id'], 'filter_sub_category' => true];
 
-					$children_data[] = array(
+					$children_data[] = [
 						'category_id' => $child['category_id'],
-						'name' => $child['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
-						'href' => $this->url->link('product/category', 'language=' . $this->config->get('config_language') . '&path=' . $category['category_id'] . '_' . $child['category_id'])
-					);
+						'name'        => $child['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
+						'href'        => $this->url->link('product/category', 'language=' . $this->config->get('config_language') . '&path=' . $category['category_id'] . '_' . $child['category_id'])
+					];
 				}
 			}
 
-			$filter_data = array(
+			$filter_data = [
 				'filter_category_id'  => $category['category_id'],
 				'filter_sub_category' => true
-			);
+			];
 
-			$data['categories'][] = array(
+			$data['categories'][] = [
 				'category_id' => $category['category_id'],
 				'name'        => $category['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
 				'children'    => $children_data,
 				'href'        => $this->url->link('product/category', 'language=' . $this->config->get('config_language') . '&path=' . $category['category_id'])
-			);
+			];
 		}
 
-		return $this->load->view('extension/module/category', $data);
+		return $this->load->view('extension/opencart/module/category', $data);
 	}
 }

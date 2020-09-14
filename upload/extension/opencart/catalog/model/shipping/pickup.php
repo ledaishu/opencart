@@ -1,5 +1,6 @@
 <?php
-class ModelExtensionShippingPickup extends Model {
+namespace Opencart\Application\Model\Extension\Opencart\Shipping;
+class Pickup extends \Opencart\System\Engine\Model {
 	function getQuote($address) {
 		$this->load->language('extension/shipping/pickup');
 
@@ -13,26 +14,26 @@ class ModelExtensionShippingPickup extends Model {
 			$status = false;
 		}
 
-		$method_data = array();
+		$method_data = [];
 
 		if ($status) {
-			$quote_data = array();
+			$quote_data = [];
 
-			$quote_data['pickup'] = array(
+			$quote_data['pickup'] = [
 				'code'         => 'pickup.pickup',
 				'title'        => $this->language->get('text_description'),
 				'cost'         => 0.00,
 				'tax_class_id' => 0,
 				'text'         => $this->currency->format(0.00, $this->session->data['currency'])
-			);
+			];
 
-			$method_data = array(
+			$method_data = [
 				'code'       => 'pickup',
 				'title'      => $this->language->get('text_title'),
 				'quote'      => $quote_data,
 				'sort_order' => $this->config->get('shipping_pickup_sort_order'),
 				'error'      => false
-			);
+			];
 		}
 
 		return $method_data;

@@ -1,9 +1,10 @@
 <?php
-class ControllerExtensionModuleCarousel extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Extension\Opencart\Module;
+class Carousel extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
-		$this->load->language('extension/module/carousel');
+		$this->load->language('extension/opencart/module/carousel');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -11,7 +12,7 @@ class ControllerExtensionModuleCarousel extends Controller {
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 			if (!isset($this->request->get['module_id'])) {
-				$this->model_setting_module->addModule('carousel', $this->request->post);
+				$this->model_setting_module->addModule('opencart.carousel', $this->request->post);
 			} else {
 				$this->model_setting_module->editModule($this->request->get['module_id'], $this->request->post);
 			}
@@ -45,34 +46,34 @@ class ControllerExtensionModuleCarousel extends Controller {
 			$data['error_height'] = '';
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_extension'),
 			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module')
-		);
+		];
 
 		if (!isset($this->request->get['module_id'])) {
-			$data['breadcrumbs'][] = array(
+			$data['breadcrumbs'][] = [
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/carousel', 'user_token=' . $this->session->data['user_token'])
-			);
+				'href' => $this->url->link('extension/opencart/module/carousel', 'user_token=' . $this->session->data['user_token'])
+			];
 		} else {
-			$data['breadcrumbs'][] = array(
+			$data['breadcrumbs'][] = [
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/carousel', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'])
-			);
+				'href' => $this->url->link('extension/opencart/module/carousel', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'])
+			];
 		}
 
 		if (!isset($this->request->get['module_id'])) {
-			$data['action'] = $this->url->link('extension/module/carousel', 'user_token=' . $this->session->data['user_token']);
+			$data['action'] = $this->url->link('extension/opencart/module/carousel', 'user_token=' . $this->session->data['user_token']);
 		} else {
-			$data['action'] = $this->url->link('extension/module/carousel', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id']);
+			$data['action'] = $this->url->link('extension/opencart/module/carousel', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id']);
 		}
 
 		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module');
@@ -129,11 +130,11 @@ class ControllerExtensionModuleCarousel extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('extension/module/carousel', $data));
+		$this->response->setOutput($this->load->view('extension/opencart/module/carousel', $data));
 	}
 
 	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/carousel')) {
+		if (!$this->user->hasPermission('modify', 'extension/opencart/module/carousel')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 

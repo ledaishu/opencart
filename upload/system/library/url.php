@@ -11,12 +11,12 @@
 /**
  * URL class.
  */
-namespace System\Library;
+namespace Opencart\System\Library;
 class Url {
 	/** @var string */
 	private $url;
 	/** @var Controller[] */
-	private $rewrite = array();
+	private $rewrite = [];
 
 	/**
 	 * Constructor.

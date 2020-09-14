@@ -10,9 +10,9 @@
 /**
 * Registry class
 */
-namespace System\Engine;
+namespace Opencart\System\Engine;
 class Registry {
-	private $data = array();
+	private $data = [];
 
 	/**
      * Get
@@ -22,7 +22,7 @@ class Registry {
 	 * @return	mixed
      */
 	public function get($key) {
-		return (isset($this->data[$key]) ? $this->data[$key] : null);
+		return (isset($this->data[$key]) ? $this->data[$key] : '');
 	}
 
     /**
