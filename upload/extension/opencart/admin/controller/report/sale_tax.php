@@ -1,26 +1,20 @@
 <?php
-namespace Opencart\Application\Controller\Extension\Opencart\Report;
+namespace Opencart\Admin\Controller\Extension\Opencart\Report;
+/**
+ * Class Sale Tax
+ *
+ * @package Opencart\Admin\Controller\Extension\Opencart\Report
+ */
 class SaleTax extends \Opencart\System\Engine\Controller {
-	public function index() {
+	/**
+	 * Index
+	 *
+	 * @return void
+	 */
+	public function index(): void {
 		$this->load->language('extension/opencart/report/sale_tax');
 
 		$this->document->setTitle($this->language->get('heading_title'));
-
-		$this->load->model('setting/setting');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			$this->model_setting_setting->editSetting('report_sale_tax', $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report'));
-		}
-
-		if (isset($this->error['warning'])) {
-			$data['error_warning'] = $this->error['warning'];
-		} else {
-			$data['error_warning'] = '';
-		}
 
 		$data['breadcrumbs'] = [];
 
@@ -39,21 +33,11 @@ class SaleTax extends \Opencart\System\Engine\Controller {
 			'href' => $this->url->link('extension/opencart/report/sale_tax', 'user_token=' . $this->session->data['user_token'])
 		];
 
-		$data['action'] = $this->url->link('extension/opencart/report/sale_tax', 'user_token=' . $this->session->data['user_token']);
+		$data['save'] = $this->url->link('extension/opencart/report/sale_tax.save', 'user_token=' . $this->session->data['user_token']);
+		$data['back'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report');
 
-		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report');
-
-		if (isset($this->request->post['report_sale_tax_status'])) {
-			$data['report_sale_tax_status'] = $this->request->post['report_sale_tax_status'];
-		} else {
-			$data['report_sale_tax_status'] = $this->config->get('report_sale_tax_status');
-		}
-
-		if (isset($this->request->post['report_sale_tax_sort_order'])) {
-			$data['report_sale_tax_sort_order'] = $this->request->post['report_sale_tax_sort_order'];
-		} else {
-			$data['report_sale_tax_sort_order'] = $this->config->get('report_sale_tax_sort_order');
-		}
+		$data['report_sale_tax_status'] = $this->config->get('report_sale_tax_status');
+		$data['report_sale_tax_sort_order'] = $this->config->get('report_sale_tax_sort_order');
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
@@ -61,79 +45,45 @@ class SaleTax extends \Opencart\System\Engine\Controller {
 
 		$this->response->setOutput($this->load->view('extension/opencart/report/sale_tax_form', $data));
 	}
-	
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/opencart/report/sale_tax')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
 
-		return !$this->error;
-	}
-	
-	public function report() {
+	/**
+	 * Save
+	 *
+	 * @return void
+	 */
+	public function save(): void {
 		$this->load->language('extension/opencart/report/sale_tax');
-		
-		if (isset($this->request->get['filter_date_start'])) {
-			$filter_date_start = $this->request->get['filter_date_start'];
-		} else {
-			$filter_date_start = '';
+
+		$json = [];
+
+		if (!$this->user->hasPermission('modify', 'extension/opencart/report/sale_tax')) {
+			$json['error'] = $this->language->get('error_permission');
 		}
 
-		if (isset($this->request->get['filter_date_end'])) {
-			$filter_date_end = $this->request->get['filter_date_end'];
-		} else {
-			$filter_date_end = '';
+		if (!$json) {
+			// Setting
+			$this->load->model('setting/setting');
+
+			$this->model_setting_setting->editSetting('report_sale_tax', $this->request->post);
+
+			$json['success'] = $this->language->get('text_success');
 		}
 
-		if (isset($this->request->get['filter_group'])) {
-			$filter_group = $this->request->get['filter_group'];
-		} else {
-			$filter_group = 'week';
-		}
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
 
-		if (isset($this->request->get['filter_order_status_id'])) {
-			$filter_order_status_id = $this->request->get['filter_order_status_id'];
-		} else {
-			$filter_order_status_id = 0;
-		}
+	/**
+	 * Report
+	 *
+	 * @return void
+	 */
+	public function report(): void {
+		$this->load->language('extension/opencart/report/sale_tax');
 
-		if (isset($this->request->get['page'])) {
-			$page = $this->request->get['page'];
-		} else {
-			$page = 1;
-		}
+		$data['list'] = $this->getReport();
 
-		$this->load->model('extension/opencart/report/sale');
-
-		$data['orders'] = [];
-
-		$filter_data = [
-			'filter_date_start'	     => $filter_date_start,
-			'filter_date_end'	     => $filter_date_end,
-			'filter_group'           => $filter_group,
-			'filter_order_status_id' => $filter_order_status_id,
-			'start'                  => ($page - 1) * $this->config->get('config_pagination'),
-			'limit'                  => $this->config->get('config_pagination')
-		];
-
-		$order_total = $this->model_extension_opencart_report_sale->getTotalTaxes($filter_data);
-
-		$data['orders'] = [];
-
-		$results = $this->model_extension_opencart_report_sale->getTaxes($filter_data);
-
-		foreach ($results as $result) {
-			$data['orders'][] = [
-				'date_start' => date($this->language->get('date_format_short'), strtotime($result['date_start'])),
-				'date_end'   => date($this->language->get('date_format_short'), strtotime($result['date_end'])),
-				'title'      => $result['title'],
-				'orders'     => $result['orders'],
-				'total'      => $this->currency->format($result['total'], $this->config->get('config_currency'))
-			];
-		}
-
-		$data['user_token'] = $this->session->data['user_token'];
-
+		// Order Statuses
 		$this->load->model('localisation/order_status');
 
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
@@ -160,30 +110,105 @@ class SaleTax extends \Opencart\System\Engine\Controller {
 			'value' => 'day',
 		];
 
-		$url = '';
+		$data['user_token'] = $this->session->data['user_token'];
 
+		$this->response->setOutput($this->load->view('extension/opencart/report/sale_tax', $data));
+	}
+
+	/**
+	 * List
+	 *
+	 * @return void
+	 */
+	public function list(): void {
+		$this->load->language('extension/opencart/report/sale_tax');
+
+		$this->response->setOutput($this->getReport());
+	}
+
+	/**
+	 * Get Report
+	 *
+	 * @return string
+	 */
+	public function getReport(): string {
 		if (isset($this->request->get['filter_date_start'])) {
-			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
+			$filter_date_start = $this->request->get['filter_date_start'];
+		} else {
+			$filter_date_start = '';
 		}
 
 		if (isset($this->request->get['filter_date_end'])) {
-			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
+			$filter_date_end = $this->request->get['filter_date_end'];
+		} else {
+			$filter_date_end = '';
 		}
 
 		if (isset($this->request->get['filter_group'])) {
-			$url .= '&filter_group=' . $this->request->get['filter_group'];
+			$filter_group = $this->request->get['filter_group'];
+		} else {
+			$filter_group = 'week';
 		}
 
 		if (isset($this->request->get['filter_order_status_id'])) {
-			$url .= '&filter_order_status_id=' . $this->request->get['filter_order_status_id'];
+			$filter_order_status_id = (int)$this->request->get['filter_order_status_id'];
+		} else {
+			$filter_order_status_id = 0;
 		}
 
-		$data['pagination'] = $this->load->controller('common/pagination', [
-			'total' => $order_total,
-			'page'  => $page,
-			'limit' => $this->config->get('config_pagination'),
-			'url'   => $this->url->link('extension/opencart/report/sale_tax/report', 'user_token=' . $this->session->data['user_token'] . '&code=sale_tax' . $url . '&page={page}')
-		]);
+		if (isset($this->request->get['page'])) {
+			$page = (int)$this->request->get['page'];
+		} else {
+			$page = 1;
+		}
+
+		// Sale
+		$data['orders'] = [];
+
+		$filter_data = [
+			'filter_date_start'      => $filter_date_start,
+			'filter_date_end'        => $filter_date_end,
+			'filter_group'           => $filter_group,
+			'filter_order_status_id' => $filter_order_status_id,
+			'start'                  => ($page - 1) * $this->config->get('config_pagination'),
+			'limit'                  => $this->config->get('config_pagination')
+		];
+
+		// Extension
+		$this->load->model('extension/opencart/report/sale');
+
+		// Total Orders
+		$order_total = $this->model_extension_opencart_report_sale->getTotalTaxes($filter_data);
+
+		// Sale
+		$data['orders'] = [];
+
+		$results = $this->model_extension_opencart_report_sale->getTaxes($filter_data);
+
+		foreach ($results as $result) {
+			$data['orders'][] = [
+				'date_start' => date($this->language->get('date_format_short'), strtotime($result['date_start'])),
+				'date_end'   => date($this->language->get('date_format_short'), strtotime($result['date_end'])),
+				'title'      => $result['title'],
+				'orders'     => $result['orders'],
+				'total'      => $result['total']
+			];
+		}
+
+		$remove = [
+			'route',
+			'user_token',
+			'code',
+			'page'
+		];
+
+		$url = http_build_query(array_diff_key($this->request->get, array_flip($remove)));
+
+		// Pagination
+		$data['total'] = $order_total;
+		$data['page'] = $page;
+		$data['limit'] = $this->config->get('config_pagination_admin');
+		$data['pagination'] = $this->url->link('extension/opencart/report/sale_tax.list', 'user_token=' . $this->session->data['user_token'] . '&code=sale_tax' . $url . '&page={page}');
 
 		$data['results'] = sprintf($this->language->get('text_pagination'), ($order_total) ? (($page - 1) * $this->config->get('config_pagination')) + 1 : 0, ((($page - 1) * $this->config->get('config_pagination')) > ($order_total - $this->config->get('config_pagination'))) ? $order_total : ((($page - 1) * $this->config->get('config_pagination')) + $this->config->get('config_pagination')), $order_total, ceil($order_total / $this->config->get('config_pagination')));
 
@@ -192,6 +217,10 @@ class SaleTax extends \Opencart\System\Engine\Controller {
 		$data['filter_group'] = $filter_group;
 		$data['filter_order_status_id'] = $filter_order_status_id;
 
-		$this->response->setOutput($this->load->view('extension/opencart/report/sale_tax', $data));
+		$data['currency'] = $this->config->get('config_currency');
+
+		$data['user_token'] = $this->session->data['user_token'];
+
+		return $this->load->view('extension/opencart/report/sale_tax_list', $data);
 	}
 }

@@ -1,0 +1,88 @@
+import { WebComponent } from '../../engine.js';
+import { loader, local } from '../../library.js';
+
+// Config
+const config = await loader.config('default');
+
+/**
+ * XZone
+ *
+ * @example <x-zone name="" value="" target="" input-id=""></x-country>
+ *
+ * @tag     x-zone
+ *
+ * @attr   string    name   name of the form element
+ *
+ * optional required disabled
+ */
+customElements.define('input-zone', class extends WebComponent {
+    static observedAttributes = [
+        'country_id',
+        'required',
+        'disabled',
+        'readonly'
+    ];
+    static formAssociated = true;
+
+    default = HTMLInputElement;
+
+    get value() {
+        return this.getAttribute('value');
+    }
+
+    set value(value) {
+        this.setAttribute('value', value);
+    }
+
+    async render() {
+        let html = '<select name="' + this.getAttribute('name') + '" id="' + this.getAttribute('input-id') + '" @change="handleChange" class="form-select"';
+
+        if (this.hasAttribute('required')) {
+            html += ' required';
+        }
+
+        if (this.hasAttribute('disabled')) {
+            html += ' disabled';
+        }
+
+        html += '>' + this.default;
+
+        //if () {
+
+        //}
+
+        let country = await loader.storage('localisation/country-' + this.getAttribute('country_id'));
+
+        console.log(country);
+
+        if (country instanceof Map) {
+            for (let zone of country['zone']) {
+                html += '<option value="' + zone.zone_id + '"';
+
+                if (zone.zone_id == this.value) {
+                    html += ' selected';
+                }
+
+                let name = '';
+
+                if (local.get('language') in zone.description) {
+                    name = zone.description[local.get('language')].name;
+                }
+
+                html += '>' + name + '</option>';
+            }
+        }
+
+        html += '</select>';
+
+        return html;
+    }
+
+    async handleConnect() {
+        this.default = this.innerHTML;
+    }
+
+    handleChange(e) {
+        this.value = e.target.value;
+    }
+});

@@ -1,144 +1,135 @@
 <?php
 /**
  * @package		OpenCart
+ *
  * @author		Daniel Kerr
- * @copyright	Copyright (c) 2005 - 2017, OpenCart, Ltd. (https://www.opencart.com/)
+ * @copyright	Copyright (c) 2005 - 2022, OpenCart, Ltd. (https://www.opencart.com/)
  * @license		https://opensource.org/licenses/GPL-3.0
- * @link		https://www.opencart.com
-*/
-
-/**
-* Mail class
-*/
+ *
+ * @see		   https://www.opencart.com
+ */
 namespace Opencart\System\Library;
+/**
+ * Class Mail
+ *
+ * Basic Mail Class
+ */
 class Mail {
-	protected $to;
-	protected $from;
-	protected $sender;
-	protected $reply_to;
-	protected $subject;
-	protected $text;
-	protected $html;
-	protected $attachments = [];
+	/**
+	 * @var array<string, mixed>
+	 */
+	private object $adaptor;
 
 	/**
 	 * Constructor
 	 *
-	 * @param	string	$adaptor
-	 *
- 	*/
-	public function __construct($adaptor = 'mail') {
+	 * @param string               $adaptor
+	 * @param array<string, mixed> $option
+	 */
+	public function __construct(string $adaptor = 'mail', array $option = []) {
 		$class = 'Opencart\System\Library\Mail\\' . $adaptor;
 
-		if (class_exists($class)) {
-			$this->adaptor = new $class();
-		} else {
-			trigger_error('Error: Could not load mail adaptor ' . $adaptor . '!');
-			exit();
+		if (!class_exists($class)) {
+			throw new \Exception('Error: Could not load mail adaptor ' . $adaptor . '!');
 		}
+
+		$this->adaptor = new $class($option);
 	}
 
 	/**
-     *
-     *
-     * @param	mixed	$to
-     */
-	public function setTo($to) {
-		$this->to = $to;
+	 * Set To
+	 *
+	 * @param array<string>|string $to
+	 *
+	 * @return void
+	 */
+	public function setTo(string|array $to): void {
+		$this->adaptor->setTo($to);
 	}
 
 	/**
-     *
-     *
-     * @param	string	$from
-     */
-	public function setFrom($from) {
-		$this->from = $from;
+	 * Set From
+	 *
+	 * @param string $from
+	 *
+	 * @return void
+	 */
+	public function setFrom(string $from): void {
+		$this->adaptor->setFrom($from);
 	}
 
 	/**
-     *
-     *
-     * @param	string	$sender
-     */
-	public function setSender($sender) {
-		$this->sender = $sender;
+	 * Set Sender
+	 *
+	 * @param string $sender
+	 *
+	 * @return void
+	 */
+	public function setSender(string $sender): void {
+		$this->adaptor->setSender($sender);
 	}
 
 	/**
-     *
-     *
-     * @param	string	$reply_to
-     */
-	public function setReplyTo($reply_to) {
-		$this->reply_to = $reply_to;
+	 * Set Reply To
+	 *
+	 * @param string $reply_to
+	 *
+	 * @return void
+	 */
+	public function setReplyTo(string $reply_to): void {
+		$this->adaptor->setReplyTo($reply_to);
 	}
 
 	/**
-     *
-     *
-     * @param	string	$subject
-     */
-	public function setSubject($subject) {
-		$this->subject = $subject;
+	 * Set Subject
+	 *
+	 * @param string $subject
+	 *
+	 * @return void
+	 */
+	public function setSubject(string $subject): void {
+		$this->adaptor->setSubject($subject);
 	}
 
 	/**
-     *
-     *
-     * @param	string	$text
-     */
-	public function setText($text) {
-		$this->text = $text;
+	 * Set Text
+	 *
+	 * @param string $text
+	 *
+	 * @return void
+	 */
+	public function setText(string $text): void {
+		$this->adaptor->setText($text);
 	}
 
 	/**
-     *
-     *
-     * @param	string	$html
-     */
-	public function setHtml($html) {
-		$this->html = $html;
+	 * Set Html
+	 *
+	 * @param string $html
+	 *
+	 * @return void
+	 */
+	public function setHtml(string $html): void {
+		$this->adaptor->setHtml($html);
 	}
 
 	/**
-     *
-     *
-     * @param	string	$filename
-     */
-	public function addAttachment($filename) {
+	 * Add Attachment
+	 *
+	 * @param string $filename
+	 *
+	 * @return void
+	 */
+	public function addAttachment(string $filename): void {
 		$this->attachments[] = $filename;
 	}
 
 	/**
-     *
-     *
-     */
-	public function send() {
-		if (!$this->to) {
-			throw new \Exception('Error: E-Mail to required!');
-		}
-
-		if (!$this->from) {
-			throw new \Exception('Error: E-Mail from required!');
-		}
-
-		if (!$this->sender) {
-			throw new \Exception('Error: E-Mail sender required!');
-		}
-
-		if (!$this->subject) {
-			throw new \Exception('Error: E-Mail subject required!');
-		}
-
-		if (!$this->text && !$this->html) {
-			throw new \Exception('Error: E-Mail message required!');
-		}
-
-		foreach (get_object_vars($this) as $key => $value) {
-			$this->adaptor->$key = $value;
-		}
-
-		$this->adaptor->send();
+	 * Send
+	 *
+	 * @return bool
+	 */
+	public function send(): bool {
+		return $this->adaptor->send();
 	}
 }

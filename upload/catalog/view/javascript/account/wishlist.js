@@ -1,0 +1,56 @@
+import { WebComponent } from '../index.js';
+import { loader, customer, local } from '../index.js';
+
+// Language
+const language = await loader.language('account/wishlist');
+
+export default class AccountWishlist extends WebComponent {
+    render() {
+        let data = new Map();
+
+        data.set('wishlist', []);
+
+        if (customer.isLogged()) {
+            data.set('wishlist', customer.getWishlist());
+        }
+
+       return loader.template('account/wishlist', [ data, language ]);
+    }
+
+    add(e) {
+        e.preventDefault();
+
+
+    }
+
+    async remove(e) {
+        e.preventDefault();
+
+        let form = new FormData(this.form);
+
+        await ajax.post('action.php?route=account/wishlist.list&language=' + local.get('language') + '&customer_token={{ customer_token }}', form, {
+            handleSend: () => {
+                this.form.state.set('submitting', true);
+            },
+            handleComplete: () => {
+                this.form.state.set('submitting', false);
+            },
+            handleSuccess: (json) => {
+                console.log(json);
+
+                if (json.has('error')) {
+                    $('#alert').prepend('<ui-alert type="danger">' + json.get('error') + '</ui-alert>');
+                }
+
+                if (json.has('success')) {
+                    $('#alert').prepend('<ui-alert type="alert-success">' + json.get('success') + '</ui-alert>');
+                }
+            },
+            handleError: (xhr, ajaxOptions, thrownError) => {
+                console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+}
+
+customElements.define('account-wishlist', AccountWishlist);

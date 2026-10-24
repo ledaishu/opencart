@@ -1,0 +1,18 @@
+<h1>{{ heading_title }}</h1>
+<p>{{ text_email }}</p>
+<form @submit="handleSubmit">
+  <fieldset>
+    <legend>{{ text_your_email }}</legend>
+    <div class="row mb-3">
+      <div class="col-sm-10"><input-email label="{{ entry_email }}" name="email" value="" required></input-email></div>
+    </div>
+  </fieldset>
+  <div class="row">
+    <div class="col">
+      <a href="account/login.js" :click="link" class="btn btn-light">{{ button_back }}</a>
+    </div>
+    <div class="col text-end">
+      <button-submit>{{ button_continue }}</button-submit>
+    </div>
+  </div>
+</form>

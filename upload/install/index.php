@@ -1,5 +1,6 @@
 <?php
-// Error Reporting
+ini_set('display_errors', 1);
+
 error_reporting(E_ALL);
 
 // Check if SSL
@@ -11,13 +12,18 @@ if ((isset($_SERVER['HTTPS']) && (($_SERVER['HTTPS'] == 'on') || ($_SERVER['HTTP
 	$protocol = 'http://';
 }
 
+// APPLICATION
+define('APPLICATION', 'Install');
+
+// HTTP
 define('HTTP_SERVER', $protocol . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/.\\') . '/');
 define('HTTP_OPENCART', $protocol . $_SERVER['HTTP_HOST'] . rtrim(rtrim(dirname($_SERVER['SCRIPT_NAME']), 'install'), '/.\\') . '/');
 
 // DIR
-define('DIR_OPENCART', str_replace('\\', '/', realpath(dirname(__FILE__) . '/../') . '/'));
+define('DIR_OPENCART', str_replace('\\', '/', realpath(__DIR__ . '/../') . '/'));
 define('DIR_APPLICATION', DIR_OPENCART . 'install/');
 define('DIR_SYSTEM', DIR_OPENCART . 'system/');
+define('DIR_EXTENSION', DIR_OPENCART . 'extension/');
 define('DIR_IMAGE', DIR_OPENCART . 'image/');
 define('DIR_STORAGE', DIR_SYSTEM . 'storage/');
 define('DIR_LANGUAGE', DIR_APPLICATION . 'language/');
@@ -26,16 +32,11 @@ define('DIR_CONFIG', DIR_SYSTEM . 'config/');
 define('DIR_CACHE', DIR_SYSTEM . 'storage/cache/');
 define('DIR_DOWNLOAD', DIR_SYSTEM . 'storage/download/');
 define('DIR_LOGS', DIR_SYSTEM . 'storage/logs/');
-define('DIR_MODIFICATION', DIR_SYSTEM . 'storage/modification/');
 define('DIR_SESSION', DIR_SYSTEM . 'storage/session/');
 define('DIR_UPLOAD', DIR_SYSTEM . 'storage/upload/');
 
 // Startup
 require_once(DIR_SYSTEM . 'startup.php');
 
-// Autoloader
-$autoloader = new \Opencart\System\Engine\Autoloader();
-$autoloader->register('Opencart\Application', DIR_APPLICATION);
-$autoloader->register('Opencart\System', DIR_SYSTEM);
-
-Opencart\start('install');
+// Framework
+require_once(DIR_SYSTEM . 'framework.php');

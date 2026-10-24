@@ -1,0 +1,302 @@
+<?php
+namespace Opencart\Admin\Controller\Task\Catalog;
+/**
+ * Class Country
+ *
+ * Generates country information.
+ *
+ * @package Opencart\Admin\Controller\Task\Catalog
+ */
+class Country extends \Opencart\System\Engine\Controller {
+	/**
+	 * Index
+	 *
+	 * Generate country list task by store.
+	 *
+	 * @param array<string, string> $args
+	 *
+	 * @return array
+	 */
+	public function index(array $args = []): array {
+		$this->load->language('task/catalog/country');
+
+		if (!array_key_exists('store_id', $args)) {
+			return ['error' => $this->language->get('error_required')];
+		}
+
+		// Store
+		$store_info = [
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name'),
+			'url'      => HTTP_CATALOG
+		];
+
+		if ($args['store_id']) {
+			$this->load->model('setting/store');
+
+			$store_info = $this->model_setting_store->getStore((int)$args['store_id']);
+
+			if (!$store_info) {
+				return ['error' => $this->language->get('error_store')];
+			}
+		}
+
+		// 1. Add country list task
+		$task_data = [
+			'code'   => 'country.list.' . $store_info['store_id'],
+			'action' => 'task/catalog/country.list',
+			'args'   => ['store_id' => $store_info['store_id']]
+		];
+
+		$this->load->model('setting/task');
+
+		$this->model_setting_task->addTask($task_data);
+
+		// 2. Add country list task
+		$this->load->model('localisation/country');
+
+		$this->load->model('setting/setting');
+
+		$country_ids = (array)$this->model_setting_setting->getValue('config_country_list', $store_info['store_id']);
+
+		foreach ($country_ids as $country_id) {
+			$country_info = $this->model_localisation_country->getCountry((int)$country_id);
+
+			if ($country_info && $country_info['status']) {
+				$task_data = [
+					'code'   => 'country.info.' . $store_info['store_id'] . '.' . $country_info['country_id'],
+					'action' => 'task/catalog/country.info',
+					'args'   => [
+						'country_id' => $country_info['country_id'],
+						'store_id'   => $store_info['store_id']
+					]
+				];
+
+				$this->model_setting_task->addTask($task_data);
+			}
+		}
+
+		return ['success' => sprintf($this->language->get('text_task'), $store_info['name'])];
+	}
+
+	/**
+	 * List
+	 *
+	 * Generate country list task by store.
+	 *
+	 * @param array<string, string> $args
+	 *
+	 * @return array
+	 */
+	public function list(array $args = []): array {
+		$this->load->language('task/catalog/country');
+
+		// Store
+		$store_info = [
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name'),
+			'url'      => HTTP_CATALOG
+		];
+
+		if ($args['store_id']) {
+			$this->load->model('setting/store');
+
+			$store_info = $this->model_setting_store->getStore((int)$args['store_id']);
+
+			if (!$store_info) {
+				return ['error' => $this->language->get('error_store')];
+			}
+		}
+
+		// Country
+		$country_data = [];
+
+		$this->load->model('localisation/country');
+
+		$country_ids = (array)$this->model_setting_setting->getValue('config_country_list', $store_info['store_id']);
+
+		foreach ($country_ids as $country_id) {
+			$country_info = $this->model_localisation_country->getCountry((int)$country_id);
+
+			if ($country_info && $country_info['status']) {
+				$description_data = [];
+
+				$descriptions = $this->model_localisation_country->getDescriptions($country_info['country_id']);
+
+				foreach ($descriptions as $code => $description) {
+					$description_data[$code] = ['name' => $description['name']];
+				}
+
+				$country_data[] = [
+					'country_id'  => $country_info['country_id'],
+					'description' => $description_data
+				];
+			}
+		}
+
+		$directory = DIR_OPENCART . 'shop/' . parse_url($store_info['url'], PHP_URL_HOST) . '/data/localisation/';
+		$filename = 'country.json';
+
+		if (!oc_directory_create($directory, 0777)) {
+			return ['error' => sprintf($this->language->get('error_directory'), $directory)];
+		}
+
+		if (!file_put_contents($directory . $filename, json_encode($country_data))) {
+			return ['error' => sprintf($this->language->get('error_file'), $directory . $filename)];
+		}
+
+		return ['success' => $this->language->get('text_list'), $store_info['name']];
+	}
+
+	/**
+	 * Info
+	 *
+	 * Generate country data by country ID.
+	 *
+	 * @param array<string, string> $args
+	 *
+	 * @return array
+	 */
+	public function info(array $args = []): array {
+		$this->load->language('task/catalog/country');
+
+		if (!array_key_exists('country_id', $args)) {
+			return ['error' => $this->language->get('error_required')];
+		}
+
+		// Store
+		$store_info = [
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name'),
+			'url'      => HTTP_CATALOG
+		];
+
+		if ($args['store_id']) {
+			$this->load->model('setting/store');
+
+			$store_info = $this->model_setting_store->getStore($args['store_id']);
+
+			if (!$store_info) {
+				return ['error' => $this->language->get('error_store')];
+			}
+		}
+
+		// Country
+		$this->load->model('localisation/country');
+
+		$country_info = $this->model_localisation_country->getCountry((int)$args['country_id']);
+
+		if (!$country_info || !$country_info['status'] || !in_array($country_info['country_id'], (array)$this->model_setting_setting->getValue('config_country_list', $store_info['store_id']))) {
+			return ['error' => $this->language->get('error_country')];
+		}
+
+		// Description
+		$description_data = [];
+
+		$descriptions = $this->model_localisation_country->getDescriptions($country_info['country_id']);
+
+		foreach ($descriptions as $code => $description) {
+			$description_data[$code] = ['name' => $description['name']];
+		}
+
+		// Zones
+		$zone_data = [];
+
+		$this->load->model('localisation/zone');
+
+		$zones = $this->model_localisation_zone->getZonesByCountryId($country_info['country_id']);
+
+		foreach ($zones as $zone) {
+			if ($zone['status']) {
+				$zone_description_data = [];
+
+				$descriptions = $this->model_localisation_zone->getDescriptions($zone['zone_id']);
+
+				foreach ($descriptions as $code => $description) {
+					$zone_description_data[$code] = ['name' => $description['name']];
+				}
+
+				$zone_data[] = [
+					'zone_id'     => $zone['zone_id'],
+					'description' => $zone_description_data,
+					'code'        => $zone['code']
+				];
+			}
+		}
+
+		// Geo Zones
+		$geo_zone_data = [];
+
+		$this->load->model('localisation/geo_zone');
+
+		$geo_zones = $this->model_localisation_geo_zone->getZonesByCountryId($country_info['country_id']);
+
+		foreach ($geo_zones as $geo_zone) {
+			$geo_zone_data[] = [
+				'zone_id'     => $geo_zone['zone_id'],
+				'geo_zone_id' => $geo_zone['geo_zone_id']
+			];
+		}
+
+		$country_data = [
+			'country_id'        => $country_info['country_id'],
+			'description'       => $description_data,
+			'iso_code_2'        => $country_info['iso_code_2'],
+			'iso_code_3'        => $country_info['iso_code_3'],
+			'address_format_id' => $country_info['address_format_id'],
+			'postcode_required' => $country_info['postcode_required'],
+			'zones'             => $zone_data,
+			'geo_zones'         => $geo_zone_data
+		];
+
+		$directory = DIR_OPENCART . 'shop/' . parse_url($store_info['url'], PHP_URL_HOST) . '/data/localisation/';
+		$filename = 'country-' . $country_info['country_id'] . '.json';
+
+		if (!oc_directory_create($directory, 0777)) {
+			return ['error' => sprintf($this->language->get('error_directory'), $directory)];
+		}
+
+		if (!file_put_contents($directory . $filename, json_encode($country_data))) {
+			return ['error' => sprintf($this->language->get('error_file'), $directory . $filename)];
+		}
+
+		return ['success' => sprintf($this->language->get('text_info'), $store_info['name'], $country_info['name'])];
+	}
+
+	/*
+	 * Delete files based on country ID
+	 *
+	 */
+	public function delete(array $args = []): array {
+		$this->load->language('task/catalog/country');
+
+		if (!array_key_exists('country_id', $args)) {
+			return ['error' => $this->language->get('error_required')];
+		}
+
+		// Store
+		$store_info = [
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name'),
+			'url'      => HTTP_CATALOG
+		];
+
+		if ($args['store_id']) {
+			$this->load->model('setting/store');
+
+			$store_info = $this->model_setting_store->getStore((int)$args['store_id']);
+
+			if (!$store_info) {
+				return ['error' => $this->language->get('error_store')];
+			}
+		}
+
+		$file = DIR_OPENCART . 'shop/' . parse_url($store_info['url'], PHP_URL_HOST) . '/data/localisation/country-' . (int)$args['country_id'] . '.json';
+
+		if (is_file($file)) {
+			unlink($file);
+		}
+
+		return ['success' => sprintf($this->language->get('text_delete'), $store_info['name'])];
+	}
+}

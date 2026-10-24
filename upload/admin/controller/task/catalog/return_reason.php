@@ -1,0 +1,74 @@
+<?php
+namespace Opencart\Admin\Controller\Task\Catalog;
+/**
+ * Class Return Reason
+ *
+ * Generates return reason data for all stores.
+ *
+ * @package Opencart\Admin\Controller\Task\Catalog
+ */
+class ReturnReason extends \Opencart\System\Engine\Controller {
+	/**
+	 * Index
+	 *
+	 * Generate return reason list task by store.
+	 *
+	 * @param array<string, string> $args
+	 *
+	 * @return array
+	 */
+	public function index(array $args = []): array {
+		$this->load->language('task/catalog/return_reason');
+
+		// Store
+		$store_info = [
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name'),
+			'url'      => HTTP_CATALOG
+		];
+
+		if ($args['store_id']) {
+			$this->load->model('setting/store');
+
+			$store_info = $this->model_setting_store->getStore((int)$args['store_id']);
+
+			if (!$store_info) {
+				return ['error' => $this->language->get('error_store')];
+			}
+		}
+
+		$return_reason_data = [];
+
+		$this->load->model('localisation/return_reason');
+
+		$return_reasons = (array)$this->model_localisation_return_reason->getReturnReasons();
+
+		foreach ($return_reasons as $return_reason) {
+			$description_data = [];
+
+			$descriptions = $this->model_localisation_return_reason->getDescriptions($return_reason['return_reason_id']);
+
+			foreach ($descriptions as $code => $description) {
+				$description_data[$code] = ['name' => $description['name']];
+			}
+
+			$return_reason_data[] = [
+				'return_reason_id' => $return_reason['return_reason_id'],
+				'description'      => $description_data
+			];
+		}
+
+		$directory = DIR_OPENCART . 'shop/' . parse_url($store_info['url'], PHP_URL_HOST) . '/data/localisation/';
+		$filename = 'return_reason.json';
+
+		if (!oc_directory_create($directory, 0777)) {
+			return ['error' => sprintf($this->language->get('error_directory'), $directory)];
+		}
+
+		if (!file_put_contents($directory . $filename, json_encode($return_reason_data))) {
+			return ['error' => sprintf($this->language->get('error_file'), $directory . $filename)];
+		}
+
+		return ['success' => sprintf($this->language->get('text_list'), $store_info['name'])];
+	}
+}

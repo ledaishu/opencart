@@ -1,0 +1,17 @@
+{% if reviews %}
+  {% for review in reviews %}
+    <table class="table table-striped table-bordered">
+      <tr>
+        <td style="width: 50%;"><strong>{{ review.author }}</strong></td>
+        <td class="text-end">{{ review.date_added }}</td>
+      </tr>
+      <tr>
+        <td colspan="2"><p>{{ review.text }}</p>
+          <review-rating rating="{{ review.rating }}"></review-rating></td>
+      </tr>
+    </table>
+  {% endfor %}
+  <div class="text-end">{{ pagination }}</div>
+{% else %}
+  <p class="text-center">{{ text_no_results }}</p>
+{% endif %}

@@ -1,14 +1,25 @@
 <?php
-namespace Opencart\Application\Controller\Extension\Opencart\Module;
+namespace Opencart\Catalog\Controller\Extension\Opencart\Module;
+/**
+ * Class Filter
+ *
+ * @package Opencart\Catalog\Controller\Extension\Opencart\Module
+ */
 class Filter extends \Opencart\System\Engine\Controller {
-	public function index() {
+	/**
+	 * Index
+	 *
+	 * @return string
+	 */
+	public function index(): string {
+		// Category
 		if (isset($this->request->get['path'])) {
 			$parts = explode('_', (string)$this->request->get['path']);
 		} else {
 			$parts = [];
 		}
 
-		$category_id = end($parts);
+		$category_id = (int)end($parts);
 
 		$this->load->model('catalog/category');
 
@@ -17,19 +28,14 @@ class Filter extends \Opencart\System\Engine\Controller {
 		if ($category_info) {
 			$this->load->language('extension/opencart/module/filter');
 
-			$url = '';
+			$remove = [
+				'route',
+				'user_token',
+				'code',
+				'page'
+			];
 
-			if (isset($this->request->get['sort'])) {
-				$url .= '&sort=' . $this->request->get['sort'];
-			}
-
-			if (isset($this->request->get['order'])) {
-				$url .= '&order=' . $this->request->get['order'];
-			}
-
-			if (isset($this->request->get['limit'])) {
-				$url .= '&limit=' . $this->request->get['limit'];
-			}
+			$url = http_build_query(array_diff_key($this->request->get, array_flip($remove)));
 
 			$data['action'] = str_replace('&amp;', '&', $this->url->link('product/category', 'language=' . $this->config->get('config_language') . '&path=' . $this->request->get['path'] . $url));
 
@@ -71,5 +77,7 @@ class Filter extends \Opencart\System\Engine\Controller {
 				return $this->load->view('extension/opencart/module/filter', $data);
 			}
 		}
+
+		return '';
 	}
 }

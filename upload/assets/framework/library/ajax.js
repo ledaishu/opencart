@@ -1,0 +1,149 @@
+/**
+ * This is a description of the MyClass constructor function.
+ *
+ * @class
+ * @classdesc This is a description of the MyClass class.
+ */
+export default class Ajax {
+    static #instance = null;
+
+    /**
+     * This function can prefix/suffix your string.
+     *
+     * @example
+     *
+     * let ajax = new Ajax();
+     *
+     * ajax.request({
+     *   url: 'index.php?route=account/login',
+     *   type: 'GET',
+     *   headers: {},
+     *   body: new FormData({}),
+     *   beforeSend: (e) => {
+     *      this.$button.state = 'loading';
+     *   },
+     *   onComplete: (json) => {
+     *      this.$button.state = '';
+     *   },
+     *   onSuccess: (json) => {
+     *
+     *   },
+     *   onError: (e) => {
+     *
+     *   }
+     * });
+     */
+    async request(url, options = {}) {
+        url = url.startsWith('http') ? url : `${document.baseURI}${url}`;
+
+        // Default Config
+        let config = {
+            method: (options.method || 'GET').toUpperCase(),
+            ...options
+        };
+
+        if (typeof options.handleSend === 'function') options.handleSend(config); // you can modify config here
+
+        // Try to parse JSON (even on error responses)
+        let result;
+
+        try {
+            let response = await fetch(url, config);
+
+            let response_type = response.headers.get('content-type');
+
+            if (response_type && response_type.includes('application/json')) {
+                let data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    result = new Map(Object.entries(data));
+                } else {
+                    result = data;
+                }
+            } else {
+                result = await response.text();
+            }
+
+            if (!response.ok) {
+                let error = new Error(result.message || `HTTP ${response.status}`);
+
+                error.status = response.status;
+                error.data = result;
+
+                throw error;
+            }
+
+            // ----- onSuccess -----
+            if (typeof options.handleSuccess === 'function') options.handleSuccess(result, response);
+        } catch (e) {
+            // ----- onError -----
+            if (typeof options.handleError === 'function') options.handleError(e);
+
+            throw e;
+        } finally {
+            // ----- onComplete -----
+            if (typeof options.handleComplete === 'function') options.handleComplete();
+        }
+
+        return result;
+    }
+
+    /**
+     * Sends a GET request, appending `data` to the URL as a query string.
+     * @param {string} url
+     * @param {object} [data] - key/value pairs serialized into the query string
+     * @param {object} [options] - extra request options, same shape as `request()`
+     * @return {Promise<*>} resolves with the parsed response body
+     */
+    get(url, data = {}, options = {}) {
+        const query = new URLSearchParams(data).toString();
+
+        return this.request(query ? `${url}?${query}` : url, {
+            method: 'GET',
+            ...options
+        });
+    }
+
+    post(url, body = {}, options = {}) {
+        return this.request(url, {
+            method: 'POST',
+            body,
+            ...options
+        });
+    }
+
+    put(url, body = {}, options = {}) {
+        return this.request(url, {
+            method: 'PUT',
+            body,
+            ...options
+        });
+    }
+
+    patch(url, body = {}, options = {}) {
+        return this.request(url, {
+            method: 'PATCH',
+            body,
+            ...options
+        });
+    }
+
+    delete(url, options = {}) {
+        return this.request(url, {
+            method: 'DELETE',
+            ...options
+        });
+    }
+
+    static getInstance() {
+        if (!Ajax.instance) {
+            Ajax.instance = new Ajax();
+        }
+
+        return Ajax.instance;
+    }
+}
+
+const ajax = Ajax.getInstance();
+
+export { ajax };

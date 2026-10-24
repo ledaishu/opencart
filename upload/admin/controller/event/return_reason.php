@@ -1,0 +1,41 @@
+<?php
+namespace Opencart\Admin\Controller\Event;
+/**
+ * Class Return Reason
+ *
+ * @package Opencart\Admin\Controller\Event
+ */
+class ReturnReason extends \Opencart\System\Engine\Controller {
+	/**
+	 * Index
+	 *
+	 * Adds task to generate new return reason list
+	 *
+	 * Triggered using model/localisation/return_reason/addReturnReason/after
+	 * Triggered using model/localisation/return_reason/editReturnReason/after
+	 * Triggered using model/localisation/return_reason/deleteReturnReason/after
+	 *
+	 * @param string            $route
+	 * @param array<int, mixed> $args
+	 * @param mixed             $output
+	 *
+	 * @return void
+	 */
+	public function index(string &$route, array &$args, &$output): void {
+		$this->load->model('setting/task');
+
+		$this->load->model('setting/store');
+
+		$store_ids = [0, ...array_column($this->model_setting_store->getStores(), 'store_id')];
+
+		foreach ($store_ids as $store_id) {
+			$task_data = [
+				'code'   => 'return_reason.' . $store_id,
+				'action' => 'task/catalog/return_reason',
+				'args'   => ['store_id' => $store_id]
+			];
+
+			$this->model_setting_task->addTask($task_data);
+		}
+	}
+}

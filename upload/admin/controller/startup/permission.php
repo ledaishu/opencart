@@ -1,33 +1,34 @@
 <?php
-namespace Opencart\Application\Controller\Startup;
+namespace Opencart\Admin\Controller\Startup;
+/**
+ * Class Permission
+ *
+ * @package Opencart\Admin\Controller\Startup
+ */
 class Permission extends \Opencart\System\Engine\Controller {
+	/**
+	 * Index
+	 *
+	 * @return \Opencart\System\Engine\Action|null
+	 */
 	public function index() {
 		if (isset($this->request->get['route'])) {
-			$route = '';
+			$pos = strrpos($this->request->get['route'], '.');
 
-			$part = explode('/', $this->request->get['route']);
-
-			if (isset($part[0])) {
-				$route .= $part[0];
+			if ($pos === false) {
+				$route = $this->request->get['route'];
+			} else {
+				$route = substr($this->request->get['route'], 0, $pos);
 			}
 
-			if (isset($part[1])) {
-				$route .= '/' . $part[1];
-			}
-
-			if ($part[0] == 'extension' && isset($part[2]) && isset($part[3])) {
-				$route .= '/' . $part[2];
-				$route .= '/' . $part[3];
-			}
-
-			// We want to ingore some pages from having its permission checked.
+			// We want to ignore some pages from having its permission checked.
 			$ignore = [
 				'common/dashboard',
 				'common/login',
 				'common/logout',
 				'common/forgotten',
-				'common/reset',
-				'common/cron',
+				'common/authorize',
+				'common/language',
 				'error/not_found',
 				'error/permission'
 			];
@@ -36,5 +37,7 @@ class Permission extends \Opencart\System\Engine\Controller {
 				return new \Opencart\System\Engine\Action('error/permission');
 			}
 		}
+
+		return null;
 	}
 }

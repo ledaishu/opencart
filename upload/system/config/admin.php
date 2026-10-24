@@ -4,12 +4,17 @@ $_['site_url']          = HTTP_SERVER;
 
 // Database
 $_['db_autostart']      = true;
-$_['db_engine']         = DB_DRIVER; // mysqli, pdo or pgsql
-$_['db_hostname']       = DB_HOSTNAME;
-$_['db_username']       = DB_USERNAME;
-$_['db_password']       = DB_PASSWORD;
-$_['db_database']       = DB_DATABASE;
-$_['db_port']           = DB_PORT;
+$_['db_option']         = [
+	'engine'   => DB_DRIVER, // mysqli, pdo or pgsql
+	'hostname' => DB_HOSTNAME,
+	'username' => DB_USERNAME,
+	'password' => DB_PASSWORD,
+	'database' => DB_DATABASE,
+	'port'     => DB_PORT,
+	'ssl_key'  => DB_SSL_KEY,
+	'ssl_cert' => DB_SSL_CERT,
+	'ssl_ca'   => DB_SSL_CA
+];
 
 // Session
 $_['session_autostart'] = false;
@@ -20,41 +25,42 @@ $_['error_display']     = true;
 
 // Actions
 $_['action_pre_action'] = [
+	'startup/setting',
+	'startup/session',
+	'startup/language',
+	'startup/application',
+	'startup/extension',
 	'startup/startup',
 	'startup/error',
 	'startup/event',
-	'startup/sass',
+	'startup/cli',
+	'startup/task',
 	'startup/login',
+	'startup/authorize',
 	'startup/permission'
 ];
 
 // Actions
-$_['action_default']    = 'common/dashboard';
+$_['action_default']     = 'common/dashboard';
 
 // Action Events
-$_['action_event']      = [
+$_['action_event']       = [
 	'controller/*/before' => [
-		'event/language/before'
+		0 => 'event/language.before'
 	],
 	'controller/*/after' => [
-		'event/language/after'
+		0 => 'event/language.after'
 	],
-	//'extension/opencart/controller/after' => [
-	//	'event/language/after'
-	//],
 	//'model/*/before' => [
-	//	'event/extension/model'
+	//  0 => 'event/debug.before'
 	//],
-	//'view/*/before' => [
-	//	'event/extension'
+	//'model/*/after' => [
+	//	0 => 'event/debug.after'
 	//],
 	'view/*/before' => [
-		999 => 'event/language'
+		999 => 'event/language.template'
+	],
+	'language/*/after' => [
+		0 => 'startup/language.after'
 	]
-	//'model/*/after' => [
-	//	'event/debug/before'
-	//],
-	//'model/*/after' => [
-	//	'event/debug/after'
-	//]
 ];
